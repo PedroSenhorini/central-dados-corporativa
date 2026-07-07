@@ -1,43 +1,61 @@
 # Central de Dados Corporativa
 
-Dashboard com duas áreas: Análise de Dados e Automação de RH.
+Aplicação React para centralizar visão operacional e automações de onboarding em uma experiência mais limpa e visualmente organizada.
 
-- **Análise de Dados** — KPIs com sparkline e dois gráficos (linha e barras), via `recharts`.
-- **Automação de RH** — onboarding com setor, cargo, gestor e licenças do Microsoft 365. O e-mail é gerado a partir do domínio do setor e o painel de status simula o provisionamento (ainda não chama a Graph API de verdade — ver abaixo).
+## Visão geral
 
-## Stack
+Este projeto conta com duas áreas principais:
+
+- Análise de Dados: painel com KPIs, gráficos e indicadores consolidados.
+- Automação de RH: fluxo de onboarding com seleção de setor, cargo, gestor e licenças do Microsoft 365.
+
+## Tecnologias
 
 - React 18
-- `react-router-dom`
-- Context API (`src/context/AppContext.jsx`) para o estado do menu lateral
+- Vite
+- React Router
 - Tailwind CSS
-- `recharts`, `lucide-react`
+- Recharts
+- Lucide React
+- Context API
 
-## Estrutura
+## Estrutura do projeto
 
-```
+```text
 src/
-  components/    Sidebar, KpiCard, ToggleSwitch, IntegrationStatus, OnboardingSummary
-  context/       AppContext.jsx
-  data/          organizacao.js (setores, gestores, cargos, acessos automáticos)
-  utils/         email.js (geração do e-mail corporativo)
-  pages/         AnaliseDados.jsx, AutomacaoRH.jsx
-  App.jsx        layout, header e rotas
-  main.jsx       bootstrap
+  app/                          Aplicação principal e layout
+  features/
+    analise-dados/pages/       Tela de análise de dados
+    automacao-rh/pages/        Tela de automação de RH
+  shared/
+    components/                 Componentes reutilizáveis
+    context/                    Contexto global da aplicação
+    data/                       Dados mockados de estrutura organizacional
+    utils/                      Funções auxiliares
 ```
 
-## Rodando
+## Como executar localmente
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abre em `/analise-dados`; o menu lateral leva até `/automacao-rh`.
+A aplicação ficará disponível em http://localhost:5173 e a navegação inicia em `/analise-dados`.
 
-## Pendências
+## Como construir
 
-- `runAutomation` (em `AutomacaoRH.jsx`) hoje só simula as etapas com `setTimeout` — plugar a Microsoft Graph API aqui.
-- KPIs e gráficos de `AnaliseDados.jsx` estão com dados mockados.
-- Setores, gestores, cargos e domínios ficam em `src/data/organizacao.js` — editar direto ali.
-- Sem autenticação ainda (considerar MSAL se for login com conta Microsoft).
+```bash
+npm run build
+```
+
+## CI/CD
+
+O projeto já conta com um workflow de CI no GitHub Actions para validar o build a cada push ou pull request na branch `main`.
+
+## Próximos passos
+
+- integrar a automação com Microsoft Graph API;
+- substituir dados mockados por backend real;
+- adicionar autenticação e permissões;
+- implementar testes automatizados.
