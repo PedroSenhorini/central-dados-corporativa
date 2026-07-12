@@ -1,24 +1,50 @@
 import { NavLink } from 'react-router-dom';
-import { BarChart3, UserCog, PanelLeftClose, PanelLeftOpen, CircleDot } from 'lucide-react';
+import { BarChart3, UserCog, Users, PanelLeftClose, PanelLeftOpen, CircleDot } from 'lucide-react';
 import { useAppContext } from '../context/AppContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { temAcessoAoModulo } from '../utils/permissoes.js';
 
-const NAV_ITEMS = [
+export const NAV_GROUPS = [
   {
-    to: '/analise-dados',
-    label: 'Análise de Dados',
-    description: 'KPIs e indicadores',
-    icon: BarChart3,
+    titulo: 'Dashboards',
+    itens: [
+      {
+        to: '/analise-dados',
+        label: 'Análise de Dados',
+        description: 'KPIs e indicadores',
+        icon: BarChart3,
+      },
+    ],
   },
   {
-    to: '/automacao-rh',
-    label: 'Automação de RH',
-    description: 'Onboarding M365',
-    icon: UserCog,
+    titulo: 'Operação',
+    itens: [
+      {
+        to: '/automacao-rh',
+        label: 'Automação de RH',
+        description: 'Onboarding M365',
+        icon: UserCog,
+        modulo: 'automacao-rh',
+      },
+    ],
+  },
+  {
+    titulo: 'Administração',
+    itens: [
+      {
+        to: '/usuarios',
+        label: 'Usuários',
+        description: 'Áreas de acesso',
+        icon: Users,
+        modulo: 'usuarios',
+      },
+    ],
   },
 ];
 
 export default function Sidebar() {
   const { sidebarOpen, toggleSidebar, runningAutomations } = useAppContext();
+  const { profile } = useAuth();
 
   return (
     <aside
@@ -31,7 +57,7 @@ export default function Sidebar() {
         {sidebarOpen && (
           <div className="leading-tight">
             <p className="font-display font-semibold text-sm tracking-wide">CENTRAL DE DADOS</p>
-            <p className="text-[11px] text-white/50">Painel Corporativo</p>
+            <p className="text-[11px] text-white/50">{profile?.empresa || 'Painel Corporativo'}</p>
           </div>
         )}
         <button
@@ -44,43 +70,54 @@ export default function Sidebar() {
       </div>
 
       {/* Navegação principal */}
-      <nav className="flex-1 px-3 py-5 space-y-1.5 overflow-y-auto scroll-slim">
-        {sidebarOpen && (
-          <p className="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/35">
-            Áreas
-          </p>
-        )}
-        {NAV_ITEMS.map(({ to, label, description, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                isActive
-                  ? 'bg-accent/15 text-white'
-                  : 'text-white/65 hover:bg-ink-soft hover:text-white'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <span
-                  className={`flex items-center justify-center w-8 h-8 rounded-md shrink-0 ${
-                    isActive ? 'bg-accent text-white' : 'bg-ink-soft text-white/70'
-                  }`}
-                >
-                  <Icon size={17} />
-                </span>
-                {sidebarOpen && (
-                  <span className="min-w-0">
-                    <span className="block text-sm font-medium truncate">{label}</span>
-                    <span className="block text-[11px] text-white/40 truncate">{description}</span>
-                  </span>
-                )}
-              </>
+      <nav className="flex-1 px-3 py-5 space-y-4 overflow-y-auto scroll-slim">
+        {NAV_GROUPS.map((grupo) => {
+          const itensVisiveis = grupo.itens.filter((item) =>
+            temAcessoAoModulo(profile?.papel, item.modulo)
+          );
+          if (itensVisiveis.length === 0) return null;
+
+          return (
+          <div key={grupo.titulo} className="space-y-1.5">
+            {sidebarOpen && (
+              <p className="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/35">
+                {grupo.titulo}
+              </p>
             )}
-          </NavLink>
-        ))}
+            {itensVisiveis.map(({ to, label, description, icon: Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                    isActive
+                      ? 'bg-accent/15 text-white'
+                      : 'text-white/65 hover:bg-ink-soft hover:text-white'
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <span
+                      className={`flex items-center justify-center w-8 h-8 rounded-md shrink-0 ${
+                        isActive ? 'bg-accent text-white' : 'bg-ink-soft text-white/70'
+                      }`}
+                    >
+                      <Icon size={17} />
+                    </span>
+                    {sidebarOpen && (
+                      <span className="min-w-0">
+                        <span className="block text-sm font-medium truncate">{label}</span>
+                        <span className="block text-[11px] text-white/40 truncate">{description}</span>
+                      </span>
+                    )}
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </div>
+          );
+        })}
       </nav>
 
       {/* Status do sistema */}
