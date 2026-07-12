@@ -3,3 +3,8 @@ dist/
 .vite/
 .env
 .DS_Store
+.vercel
+.env*
+.claude/
+.agents/
+skills-lock.json
