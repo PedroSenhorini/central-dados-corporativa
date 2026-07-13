@@ -5,6 +5,7 @@ import Sidebar, { NAV_GROUPS } from '../shared/components/Sidebar.jsx';
 import AnaliseDados from '../features/analise-dados/pages/AnaliseDadosPage.jsx';
 import AutomacaoRH from '../features/automacao-rh/pages/AutomacaoRhPage.jsx';
 import VagasRh from '../features/vagas-rh/pages/VagasRhPage.jsx';
+import DesligamentoRH from '../features/desligamento-rh/pages/DesligamentoRhPage.jsx';
 import Usuarios from '../features/usuarios/pages/UsuariosPage.jsx';
 import LoginPage from '../features/auth/pages/LoginPage.jsx';
 import RegisterPage from '../features/auth/pages/RegisterPage.jsx';
@@ -17,6 +18,7 @@ const PAGE_TITLES = {
   '/analise-dados': 'Análise de Dados',
   '/automacao-rh': 'Automação de RH',
   '/vagas-rh': 'Vagas (RH)',
+  '/desligamento-rh': 'Desligamento',
   '/usuarios': 'Usuários',
 };
 
@@ -162,6 +164,14 @@ function PainelPrincipal() {
               }
             />
             <Route path="/vagas-rh" element={<VagasRh />} />
+            <Route
+              path="/desligamento-rh"
+              element={
+                <RequireRole modulo="desligamento-rh">
+                  <DesligamentoRH />
+                </RequireRole>
+              }
+            />
             <Route
               path="/usuarios"
               element={

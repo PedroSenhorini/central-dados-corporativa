@@ -13,6 +13,14 @@ alter table public.profiles drop constraint if exists profiles_papel_check;
 alter table public.profiles add constraint profiles_papel_check
   check (papel in ('geral', 'pcp', 'sac', 'vendas', 'compras', 'ti', 'rh', 'marketing', 'admin'));
 
+-- Desligamento: 'ativo = false' bloqueia o acesso do colaborador à Central
+-- de Dados (ver ProtectedRoute) — é o que a automação de desligamento liga.
+alter table public.profiles
+  add column if not exists ativo boolean not null default true;
+
+alter table public.profiles
+  add column if not exists data_desligamento date;
+
 alter table public.profiles enable row level security;
 
 drop policy if exists "Usuário lê o próprio perfil" on public.profiles;
@@ -32,7 +40,7 @@ security definer
 set search_path = public
 as $$
   select exists (
-    select 1 from public.profiles where id = auth.uid() and papel = 'admin'
+    select 1 from public.profiles where id = auth.uid() and papel = 'admin' and ativo
   );
 $$;
 
@@ -45,6 +53,32 @@ drop policy if exists "Admin atualiza qualquer perfil" on public.profiles;
 create policy "Admin atualiza qualquer perfil"
   on public.profiles for update
   using (public.is_admin());
+
+-- security definer: evita recursão infinita de RLS ao checar o papel do
+-- próprio usuário dentro de uma policy da tabela profiles (mesmo motivo de
+-- is_admin() acima).
+create or replace function public.is_rh()
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles where id = auth.uid() and papel = 'rh' and ativo
+  );
+$$;
+
+-- RH enxerga todos os perfis e pode desligar colaboradores (exceto admins,
+-- para não correr o risco de um RH bloquear a própria administração).
+drop policy if exists "RH lê todos os perfis" on public.profiles;
+create policy "RH lê todos os perfis"
+  on public.profiles for select
+  using (public.is_rh());
+
+drop policy if exists "RH desliga colaboradores" on public.profiles;
+create policy "RH desliga colaboradores"
+  on public.profiles for update
+  using (papel <> 'admin' and public.is_rh());
 
 create or replace function public.handle_new_user()
 returns trigger
@@ -107,7 +141,7 @@ create policy "RH e admin veem todas as vagas"
   on public.vagas_rh for select
   using (
     public.is_admin()
-    or exists (select 1 from public.profiles where id = auth.uid() and papel = 'rh')
+    or public.is_rh()
   );
 
 drop policy if exists "RH e admin criam vagas" on public.vagas_rh;
@@ -115,7 +149,7 @@ create policy "RH e admin criam vagas"
   on public.vagas_rh for insert
   with check (
     public.is_admin()
-    or exists (select 1 from public.profiles where id = auth.uid() and papel = 'rh')
+    or public.is_rh()
   );
 
 drop policy if exists "RH e admin atualizam qualquer vaga" on public.vagas_rh;
@@ -123,7 +157,7 @@ create policy "RH e admin atualizam qualquer vaga"
   on public.vagas_rh for update
   using (
     public.is_admin()
-    or exists (select 1 from public.profiles where id = auth.uid() and papel = 'rh')
+    or public.is_rh()
   );
 
 drop policy if exists "RH e admin excluem vagas" on public.vagas_rh;
@@ -131,7 +165,7 @@ create policy "RH e admin excluem vagas"
   on public.vagas_rh for delete
   using (
     public.is_admin()
-    or exists (select 1 from public.profiles where id = auth.uid() and papel = 'rh')
+    or public.is_rh()
   );
 
 -- Gestor solicitante: enxerga e movimenta apenas a própria vaga, mesmo

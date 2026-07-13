@@ -1,5 +1,6 @@
 const MODULOS_RESTRITOS = {
   'automacao-rh': ['rh'],
+  'desligamento-rh': ['rh'],
   usuarios: [],
 };
 

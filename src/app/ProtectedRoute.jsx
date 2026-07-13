@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { Loader2, DatabaseZap } from 'lucide-react';
+import { Loader2, DatabaseZap, UserX } from 'lucide-react';
 import { useAuth } from '../shared/context/AuthContext.jsx';
 
 function TelaCentral({ children }) {
@@ -11,7 +11,7 @@ function TelaCentral({ children }) {
 }
 
 export default function ProtectedRoute() {
-  const { configured, loading, isAuthenticated } = useAuth();
+  const { configured, loading, isAuthenticated, profile, signOut } = useAuth();
 
   if (!configured) {
     return (
@@ -40,6 +40,28 @@ export default function ProtectedRoute() {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (profile?.ativo === false) {
+    return (
+      <TelaCentral>
+        <span className="flex items-center justify-center w-12 h-12 rounded-full bg-red-50 text-red-600">
+          <UserX size={22} />
+        </span>
+        <p className="font-display font-semibold text-ink2">Acesso bloqueado</p>
+        <p className="text-sm text-muted">
+          Seu acesso à Central de Dados foi encerrado. Se você acredita que isso é um engano,
+          fale com o RH ou com um administrador.
+        </p>
+        <button
+          type="button"
+          onClick={signOut}
+          className="mt-1 text-sm font-medium text-primary hover:text-primary-hover transition-colors"
+        >
+          Sair
+        </button>
+      </TelaCentral>
+    );
   }
 
   return <Outlet />;
