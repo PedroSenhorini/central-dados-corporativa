@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { BarChart3, UserCog, Users, PanelLeftClose, PanelLeftOpen, CircleDot } from 'lucide-react';
+import { BarChart3, UserCog, Users, KanbanSquare, PanelLeftClose, PanelLeftOpen, CircleDot } from 'lucide-react';
 import { useAppContext } from '../context/AppContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { temAcessoAoModulo } from '../utils/permissoes.js';
@@ -25,6 +25,12 @@ export const NAV_GROUPS = [
         description: 'Onboarding M365',
         icon: UserCog,
         modulo: 'automacao-rh',
+      },
+      {
+        to: '/vagas-rh',
+        label: 'Vagas (RH)',
+        description: 'Kanban e SLA de contratação',
+        icon: KanbanSquare,
       },
     ],
   },

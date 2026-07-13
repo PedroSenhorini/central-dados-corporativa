@@ -4,6 +4,7 @@ import { LogOut, Search, Bell } from 'lucide-react';
 import Sidebar, { NAV_GROUPS } from '../shared/components/Sidebar.jsx';
 import AnaliseDados from '../features/analise-dados/pages/AnaliseDadosPage.jsx';
 import AutomacaoRH from '../features/automacao-rh/pages/AutomacaoRhPage.jsx';
+import VagasRh from '../features/vagas-rh/pages/VagasRhPage.jsx';
 import Usuarios from '../features/usuarios/pages/UsuariosPage.jsx';
 import LoginPage from '../features/auth/pages/LoginPage.jsx';
 import RegisterPage from '../features/auth/pages/RegisterPage.jsx';
@@ -15,6 +16,7 @@ import { useAuth } from '../shared/context/AuthContext.jsx';
 const PAGE_TITLES = {
   '/analise-dados': 'Análise de Dados',
   '/automacao-rh': 'Automação de RH',
+  '/vagas-rh': 'Vagas (RH)',
   '/usuarios': 'Usuários',
 };
 
@@ -159,6 +161,7 @@ function PainelPrincipal() {
                 </RequireRole>
               }
             />
+            <Route path="/vagas-rh" element={<VagasRh />} />
             <Route
               path="/usuarios"
               element={
