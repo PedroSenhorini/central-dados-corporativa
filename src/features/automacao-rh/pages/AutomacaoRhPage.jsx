@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Mail } from 'lucide-react';
 import ToggleSwitch from '../../../shared/components/ToggleSwitch.jsx';
 import IntegrationStatus from '../../../shared/components/IntegrationStatus.jsx';
 import OnboardingSummary from '../../../shared/components/OnboardingSummary.jsx';
