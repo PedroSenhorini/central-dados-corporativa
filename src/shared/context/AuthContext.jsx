@@ -11,11 +11,12 @@ async function buscarProfile(user) {
     empresa: metadata.empresa ?? '',
     cargo: metadata.cargo ?? '',
     papel: metadata.papel || 'geral',
+    ativo: true,
   };
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('nome, empresa, cargo, papel')
+    .select('nome, empresa, cargo, papel, ativo')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -29,6 +30,7 @@ async function buscarProfile(user) {
     empresa: data?.empresa || base.empresa,
     cargo: data?.cargo || base.cargo,
     papel: data?.papel || base.papel,
+    ativo: data?.ativo ?? base.ativo,
   };
 }
 

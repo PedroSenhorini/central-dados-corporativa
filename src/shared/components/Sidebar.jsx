@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { BarChart3, UserCog, Users, KanbanSquare, PanelLeftClose, PanelLeftOpen, CircleDot } from 'lucide-react';
+import { BarChart3, UserCog, UserX, Users, KanbanSquare, PanelLeftClose, PanelLeftOpen, CircleDot } from 'lucide-react';
 import { useAppContext } from '../context/AppContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { temAcessoAoModulo } from '../utils/permissoes.js';
@@ -31,6 +31,13 @@ export const NAV_GROUPS = [
         label: 'Vagas (RH)',
         description: 'Kanban e SLA de contratação',
         icon: KanbanSquare,
+      },
+      {
+        to: '/desligamento-rh',
+        label: 'Desligamento',
+        description: 'Bloqueio de acessos e licenças',
+        icon: UserX,
+        modulo: 'desligamento-rh',
       },
     ],
   },

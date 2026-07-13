@@ -1,20 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Mail, Users2, PresentationIcon, FolderKanban, Bot, MessagesSquare } from 'lucide-react';
 import ToggleSwitch from '../../../shared/components/ToggleSwitch.jsx';
 import IntegrationStatus from '../../../shared/components/IntegrationStatus.jsx';
 import OnboardingSummary from '../../../shared/components/OnboardingSummary.jsx';
 import { useAppContext } from '../../../shared/context/AppContext.jsx';
 import { SETORES, LICENCAS_SUGERIDAS_POR_CARGO, getSetorById } from '../../../shared/data/organizacao.js';
+import { LICENCAS_M365 } from '../../../shared/data/licencas.js';
 import { gerarEmailCorporativo } from '../../../shared/utils/email.js';
 
-const LICENSES = [
-  { id: 'e3', label: 'Microsoft 365 E3', description: 'Office, e-mail e armazenamento', icon: Mail },
-  { id: 'teams', label: 'Microsoft Teams', description: 'Chamadas e colaboração', icon: MessagesSquare },
-  { id: 'sharepoint', label: 'SharePoint', description: 'Portais e documentos de equipe', icon: FolderKanban },
-  { id: 'powerbi', label: 'Power BI Pro', description: 'Relatórios e dashboards', icon: PresentationIcon },
-  { id: 'copilot', label: 'Copilot para M365', description: 'Assistente de IA integrado', icon: Bot },
-  { id: 'exchange', label: 'Exchange Online', description: 'Caixa de e-mail corporativa', icon: Users2 },
-];
+const LICENSES = LICENCAS_M365;
 
 const STEPS = [
   { id: 'validar', label: 'Validar dados do funcionário' },
