@@ -179,3 +179,98 @@ drop policy if exists "Gestor move a propria vaga solicitada" on public.vagas_rh
 create policy "Gestor move a propria vaga solicitada"
   on public.vagas_rh for update
   using (gestor_solicitante_id = auth.uid());
+
+-- security definer: mesmo motivo de is_admin()/is_rh() acima — evita
+-- recursão infinita de RLS ao checar o papel do próprio usuário.
+create or replace function public.is_compras()
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.profiles where id = auth.uid() and papel = 'compras' and ativo
+  );
+$$;
+
+-- Solicitação de compra: qualquer colaborador pede a compra/orçamento de um
+-- produto ou equipamento; o time de Compras conduz a cotação até o fechamento.
+create table if not exists public.solicitacoes_compra (
+  id uuid primary key default gen_random_uuid(),
+  item text not null,
+  categoria text not null default 'material',
+  descricao text,
+  quantidade integer not null default 1,
+  valor_estimado numeric(12, 2),
+  urgencia text not null default 'media',
+  justificativa text,
+  fornecedor_sugerido text,
+  data_necessidade date,
+  status text not null default 'solicitado',
+  solicitante_id uuid references public.profiles (id) on delete set null,
+  responsavel_compras_id uuid references public.profiles (id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.solicitacoes_compra drop constraint if exists solicitacoes_compra_categoria_check;
+alter table public.solicitacoes_compra add constraint solicitacoes_compra_categoria_check
+  check (categoria in ('equipamento', 'material', 'software', 'servico', 'outro'));
+
+alter table public.solicitacoes_compra drop constraint if exists solicitacoes_compra_urgencia_check;
+alter table public.solicitacoes_compra add constraint solicitacoes_compra_urgencia_check
+  check (urgencia in ('baixa', 'media', 'alta', 'critica'));
+
+alter table public.solicitacoes_compra drop constraint if exists solicitacoes_compra_status_check;
+alter table public.solicitacoes_compra add constraint solicitacoes_compra_status_check
+  check (status in ('solicitado', 'em_cotacao', 'aprovado', 'comprado', 'recusado'));
+
+alter table public.solicitacoes_compra drop constraint if exists solicitacoes_compra_quantidade_check;
+alter table public.solicitacoes_compra add constraint solicitacoes_compra_quantidade_check
+  check (quantidade > 0);
+
+alter table public.solicitacoes_compra enable row level security;
+
+-- Compras e admin enxergam e administram todas as solicitações.
+drop policy if exists "Compras e admin veem todas as solicitacoes" on public.solicitacoes_compra;
+create policy "Compras e admin veem todas as solicitacoes"
+  on public.solicitacoes_compra for select
+  using (
+    public.is_admin()
+    or public.is_compras()
+  );
+
+drop policy if exists "Compras e admin atualizam qualquer solicitacao" on public.solicitacoes_compra;
+create policy "Compras e admin atualizam qualquer solicitacao"
+  on public.solicitacoes_compra for update
+  using (
+    public.is_admin()
+    or public.is_compras()
+  );
+
+drop policy if exists "Compras e admin excluem solicitacoes" on public.solicitacoes_compra;
+create policy "Compras e admin excluem solicitacoes"
+  on public.solicitacoes_compra for delete
+  using (
+    public.is_admin()
+    or public.is_compras()
+  );
+
+-- Qualquer colaborador autenticado pode pedir a compra de um produto ou
+-- equipamento — a solicitação nasce sempre em nome do próprio usuário.
+drop policy if exists "Colaborador cria a propria solicitacao" on public.solicitacoes_compra;
+create policy "Colaborador cria a propria solicitacao"
+  on public.solicitacoes_compra for insert
+  with check (solicitante_id = auth.uid());
+
+-- Solicitante: enxerga e edita apenas os próprios pedidos, mesmo fora do
+-- time de Compras — mesma lógica do gestor solicitante em vagas_rh.
+drop policy if exists "Solicitante ve a propria solicitacao" on public.solicitacoes_compra;
+create policy "Solicitante ve a propria solicitacao"
+  on public.solicitacoes_compra for select
+  using (solicitante_id = auth.uid());
+
+drop policy if exists "Solicitante atualiza a propria solicitacao" on public.solicitacoes_compra;
+create policy "Solicitante atualiza a propria solicitacao"
+  on public.solicitacoes_compra for update
+  using (solicitante_id = auth.uid());
