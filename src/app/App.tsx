@@ -7,6 +7,7 @@ import AutomacaoRH from '../features/automacao-rh/pages/AutomacaoRhPage.js';
 import VagasRh from '../features/vagas-rh/pages/VagasRhPage.js';
 import DesligamentoRH from '../features/desligamento-rh/pages/DesligamentoRhPage.js';
 import Compras from '../features/compras/pages/ComprasPage.js';
+import AcademiasDrakos from '../features/academias-drakos/pages/AcademiasDrakosPage.js';
 import Usuarios from '../features/usuarios/pages/UsuariosPage.js';
 import LoginPage from '../features/auth/pages/LoginPage.js';
 import RegisterPage from '../features/auth/pages/RegisterPage.js';
@@ -21,6 +22,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/vagas-rh': 'Vagas (RH)',
   '/desligamento-rh': 'Desligamento',
   '/compras': 'Compras',
+  '/academias-drakos': 'Academias Drakos',
   '/usuarios': 'Usuários',
 };
 
@@ -169,6 +171,14 @@ function PainelPrincipal() {
             />
             <Route path="/vagas-rh" element={<VagasRh />} />
             <Route path="/compras" element={<Compras />} />
+            <Route
+              path="/academias-drakos"
+              element={
+                <RequireRole modulo="academias-drakos">
+                  <AcademiasDrakos />
+                </RequireRole>
+              }
+            />
             <Route
               path="/desligamento-rh"
               element={

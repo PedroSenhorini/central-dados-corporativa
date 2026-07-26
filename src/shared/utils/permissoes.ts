@@ -3,6 +3,7 @@ import type { Papel } from '../types/database.js';
 const MODULOS_RESTRITOS: Record<string, Papel[]> = {
   'automacao-rh': ['rh'],
   'desligamento-rh': ['rh'],
+  'academias-drakos': ['ti'],
   usuarios: [],
 };
 
