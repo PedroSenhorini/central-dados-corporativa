@@ -9,7 +9,7 @@ export interface KpiDef {
   melhorQuandoAumenta: boolean;
 }
 
-/** Ponto de um gráfico: chaves variam por área (mes/categoria + valor). */
+// as chaves mudam de acordo com a área (mes/categoria + valor)
 export type PontoGrafico = Record<string, string | number>;
 
 export interface GraficoDef {

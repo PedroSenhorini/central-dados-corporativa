@@ -92,9 +92,14 @@ export default function VagasRhPage() {
     (v) => !ETAPAS_FINAIS.includes(v.status) && calcularDiasEmAberto(v) >= v.prazo_sla_dias
   ).length;
   const contratadas = vagas.filter((v) => v.status === 'contratada');
-  const tempoMedioContratacao = contratadas.length
-    ? Math.round(contratadas.reduce((soma, v) => soma + calcularDiasEmAberto(v), 0) / contratadas.length)
-    : null;
+  let tempoMedioContratacao = null;
+  if (contratadas.length > 0) {
+    let somaDias = 0;
+    for (const v of contratadas) {
+      somaDias += calcularDiasEmAberto(v);
+    }
+    tempoMedioContratacao = Math.round(somaDias / contratadas.length);
+  }
 
   if (carregando) {
     return (

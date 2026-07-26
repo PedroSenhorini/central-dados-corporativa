@@ -1,11 +1,7 @@
 import { AREAS_DASHBOARD } from '../../analise-dados/data/dashboards.js';
 import type { PrioridadeVaga, StatusVaga, VagaRhRow } from '../../../shared/types/database.js';
 
-/**
- * Colunas do kanban de vagas. 'contratada' e 'cancelada' são as etapas
- * finais — ao entrar em qualquer uma delas a vaga para de contar prazo de
- * SLA (ver calcularDiasEmAberto).
- */
+// colunas do kanban. contratada e cancelada são etapas finais, aí a vaga para de contar SLA
 export const COLUNAS_VAGAS: { id: StatusVaga; titulo: string }[] = [
   { id: 'aberta', titulo: 'Aberta' },
   { id: 'triagem', titulo: 'Triagem' },
@@ -31,7 +27,7 @@ export const SETORES_VAGA = AREAS_DASHBOARD.filter((a) => a.id !== 'geral').map(
 type VagaComPrazo = Pick<VagaRhRow, 'data_abertura' | 'data_fechamento'>;
 type VagaComSla = Pick<VagaRhRow, 'status' | 'prazo_sla_dias' | 'data_abertura' | 'data_fechamento'>;
 
-/** Dias corridos desde a abertura da vaga até o fechamento (ou até hoje, se ainda aberta). */
+// dias corridos desde a abertura até o fechamento (ou até hoje, se a vaga ainda tá aberta)
 export function calcularDiasEmAberto(vaga: VagaComPrazo): number {
   const inicio = new Date(vaga.data_abertura);
   const fim = vaga.data_fechamento ? new Date(vaga.data_fechamento) : new Date();
@@ -40,10 +36,7 @@ export function calcularDiasEmAberto(vaga: VagaComPrazo): number {
 
 export type SituacaoSla = 'concluida' | 'vencida' | 'atencao' | 'no-prazo';
 
-/**
- * Situação do SLA da vaga: 'concluida' (já fechou), 'vencida' (estourou o
- * prazo), 'atencao' (a 70% do prazo) ou 'no-prazo'.
- */
+// situação do SLA: concluida (já fechou), vencida (estourou o prazo), atencao (>= 70% do prazo) ou no-prazo
 export function calcularSituacaoSla(vaga: VagaComSla): SituacaoSla {
   if (ETAPAS_FINAIS.includes(vaga.status)) return 'concluida';
   const dias = calcularDiasEmAberto(vaga);

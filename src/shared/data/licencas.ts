@@ -7,10 +7,7 @@ export interface LicencaM365 {
   icon: LucideIcon;
 }
 
-/**
- * Licenças do Microsoft 365 usadas tanto no onboarding (concessão) quanto
- * no desligamento (revogação) — mesmo catálogo, ações opostas.
- */
+// mesmo catálogo de licenças usado no onboarding (concessão) e no desligamento (revogação)
 export const LICENCAS_M365: LicencaM365[] = [
   { id: 'e3', label: 'Microsoft 365 E3', description: 'Office, e-mail e armazenamento', icon: Mail },
   { id: 'teams', label: 'Microsoft Teams', description: 'Chamadas e colaboração', icon: MessagesSquare },

@@ -10,12 +10,7 @@ interface AppContextValue {
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
 
-/**
- * Provedor global da aplicação.
- * Guarda o estado do menu lateral e um contador simples de
- * automações de onboarding em andamento, para exibir feedback
- * em qualquer parte da interface (ex: badge na sidebar).
- */
+// guarda o estado da sidebar e um contador de automações rodando (pra mostrar feedback tipo badge)
 export function AppProvider({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [runningAutomations, setRunningAutomations] = useState(0);

@@ -13,9 +13,7 @@ interface IntegrationStatusProps {
   currentStepIndex: number;
 }
 
-/**
- * Exibe o progresso da automação de onboarding em tempo real.
- */
+// mostra o progresso da automação de onboarding em tempo real
 export default function IntegrationStatus({ steps, status, currentStepIndex }: IntegrationStatusProps) {
   const completedCount =
     status === 'done' ? steps.length : Math.max(currentStepIndex, 0);
@@ -54,6 +52,21 @@ export default function IntegrationStatus({ steps, status, currentStepIndex }: I
           const isDone = status === 'done' || index < currentStepIndex;
           const isRunning = status === 'running' && index === currentStepIndex;
 
+          // monta as classes de cor conforme o estado da etapa
+          let corBolinha = 'bg-canvas text-muted';
+          if (isDone) {
+            corBolinha = 'bg-success text-white';
+          } else if (isRunning) {
+            corBolinha = 'bg-accent-soft text-accent';
+          }
+
+          let corTexto = 'text-muted';
+          if (isDone) {
+            corTexto = 'text-ink2 font-medium';
+          } else if (isRunning) {
+            corTexto = 'text-ink2';
+          }
+
           return (
             <li key={step.id} className="flex gap-3 relative pb-5 last:pb-0">
               {index < steps.length - 1 && (
@@ -64,13 +77,7 @@ export default function IntegrationStatus({ steps, status, currentStepIndex }: I
                 />
               )}
               <span
-                className={`flex items-center justify-center w-6 h-6 rounded-full shrink-0 z-10 ${
-                  isDone
-                    ? 'bg-success text-white'
-                    : isRunning
-                    ? 'bg-accent-soft text-accent'
-                    : 'bg-canvas text-muted'
-                }`}
+                className={`flex items-center justify-center w-6 h-6 rounded-full shrink-0 z-10 ${corBolinha}`}
               >
                 {isDone ? (
                   <Check size={14} />
@@ -80,11 +87,7 @@ export default function IntegrationStatus({ steps, status, currentStepIndex }: I
                   <Circle size={9} fill="currentColor" />
                 )}
               </span>
-              <span
-                className={`text-sm pt-0.5 ${
-                  isDone ? 'text-ink2 font-medium' : isRunning ? 'text-ink2' : 'text-muted'
-                }`}
-              >
+              <span className={`text-sm pt-0.5 ${corTexto}`}>
                 {step.label}
               </span>
             </li>

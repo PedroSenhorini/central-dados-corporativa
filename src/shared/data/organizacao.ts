@@ -1,18 +1,5 @@
-/**
- * Dados organizacionais mockados.
- *
- * Em produção, isso viria da sua base (Azure AD, planilha de estrutura
- * organizacional, ou uma API interna) — aqui está centralizado num único
- * lugar para ficar fácil de substituir por uma chamada real.
- *
- * Cada setor carrega:
- * - dominio: domínio de e-mail usado por esse setor (vocês usam mais de um)
- * - gestores: gestores que podem ser vinculados a esse setor
- * - cargos: cargos possíveis dentro do setor
- * - acessosAutomaticos: SharePoint / e-mails compartilhados / Teams que
- *   TODO colaborador do setor recebe automaticamente (não é opcional,
- *   por isso não aparece como toggle — é aplicado direto pela automação)
- */
+// dados organizacionais mockados - em produção viria do Azure AD ou de uma API interna
+// acessosAutomaticos = SharePoint/e-mail/Teams que todo mundo do setor já ganha, não é opcional então não vira toggle
 
 export interface AcessoAutomatico {
   tipo: string;
@@ -77,11 +64,7 @@ export const SETORES: Setor[] = [
   },
 ];
 
-/**
- * Licenças do Microsoft 365 sugeridas automaticamente conforme o cargo.
- * O usuário ainda pode ligar/desligar qualquer uma no formulário — isso
- * só define o ponto de partida para agilizar o preenchimento.
- */
+// licenças sugeridas conforme o cargo, só pra agilizar - o usuário pode trocar tudo no formulário
 export const LICENCAS_SUGERIDAS_POR_CARGO: Record<string, string[]> = {
   'Executivo de Contas': ['e3', 'teams'],
   'Gerente Comercial': ['e3', 'teams', 'powerbi'],

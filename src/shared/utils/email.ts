@@ -1,6 +1,4 @@
-/**
- * Remove acentos e caixa alta para gerar um "slug" seguro para e-mail.
- */
+// tira acento e deixa minúsculo pra virar um slug seguro de e-mail
 function normalizar(texto: string): string {
   return texto
     .normalize('NFD')
@@ -10,10 +8,7 @@ function normalizar(texto: string): string {
     .trim();
 }
 
-/**
- * Gera o e-mail corporativo no padrão nome.sobrenome@dominio.
- * Se a pessoa tiver só um nome, usa apenas ele.
- */
+// gera o e-mail no padrão nome.sobrenome@dominio (se só tiver um nome, usa só ele)
 export function gerarEmailCorporativo(nomeCompleto: string, dominio: string): string {
   if (!nomeCompleto || !dominio) return '';
 
