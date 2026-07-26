@@ -1,12 +1,7 @@
 import type { AreaDashboard, DadosDashboard, FiltrosDashboard, GraficoDef, PontoGrafico } from '../data/types.js';
 
-/**
- * Transformações puras aplicadas aos dados mockados dos dashboards a
- * partir dos filtros globais (período / filial). Isoladas em funções
- * puras para que, quando os dashboards passarem a consumir uma API real,
- * baste trocar quem chama estas funções (o back-end já devolveria os
- * dados neste formato, e este arquivo inteiro poderia sumir).
- */
+// funções que aplicam os filtros (período/filial) em cima dos dados mockados.
+// quando tiver API de verdade isso tudo pode sumir daqui
 
 export interface Periodo {
   id: string;
@@ -51,39 +46,30 @@ function recortarUltimos<T>(lista: T[], quantidade: number): T[] {
   return lista.slice(Math.max(0, lista.length - quantidade));
 }
 
-/**
- * Aplica os filtros globais a uma área de dashboard inteira (kpis +
- * gráfico de linha + gráfico de barra), devolvendo um objeto novo pronto
- * para os componentes renderizarem — igual ao que um endpoint BFF real
- * devolveria já formatado para a lib de gráficos.
- */
+// pega uma área inteira (kpis + os dois gráficos) e devolve os dados já
+// filtrados por período/filial, prontos pra jogar nos componentes
 export function aplicarFiltros(area: AreaDashboard, filtros: FiltrosDashboard): DadosDashboard {
   const fator = fatorFilial(filtros.filialId);
   const meses = mesesPeriodo(filtros.periodoId);
 
   const kpis = area.kpis.map((kpi) => {
-    const sparkline = recortarUltimos(
-      kpi.sparkline.map((v) => escalar(v, fator)),
-      meses,
-    );
+    const sparklineEscalada = kpi.sparkline.map((v) => escalar(v, fator));
+    const sparkline = recortarUltimos(sparklineEscalada, meses);
     return { ...kpi, sparkline };
   });
 
-  const graficoLinha: GraficoDef = {
-    ...area.graficoLinha,
-    dados: recortarUltimos(area.graficoLinha.dados, meses).map((ponto): PontoGrafico => ({
-      ...ponto,
-      [area.graficoLinha.dataKey]: escalar(Number(ponto[area.graficoLinha.dataKey]), fator),
-    })),
-  };
+  const pontosLinha = recortarUltimos(area.graficoLinha.dados, meses);
+  const dadosLinha: PontoGrafico[] = pontosLinha.map((ponto) => {
+    const valorOriginal = Number(ponto[area.graficoLinha.dataKey]);
+    return { ...ponto, [area.graficoLinha.dataKey]: escalar(valorOriginal, fator) };
+  });
+  const graficoLinha: GraficoDef = { ...area.graficoLinha, dados: dadosLinha };
 
-  const graficoBarra: GraficoDef = {
-    ...area.graficoBarra,
-    dados: area.graficoBarra.dados.map((ponto): PontoGrafico => ({
-      ...ponto,
-      [area.graficoBarra.dataKey]: escalar(Number(ponto[area.graficoBarra.dataKey]), fator),
-    })),
-  };
+  const dadosBarra: PontoGrafico[] = area.graficoBarra.dados.map((ponto) => {
+    const valorOriginal = Number(ponto[area.graficoBarra.dataKey]);
+    return { ...ponto, [area.graficoBarra.dataKey]: escalar(valorOriginal, fator) };
+  });
+  const graficoBarra: GraficoDef = { ...area.graficoBarra, dados: dadosBarra };
 
   return { kpis, graficoLinha, graficoBarra };
 }

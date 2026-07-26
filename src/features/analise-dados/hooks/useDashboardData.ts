@@ -5,19 +5,9 @@ import type { DadosDashboard, FiltrosDashboard } from '../data/types.js';
 
 const LATENCIA_SIMULADA_MS = 450;
 
-/**
- * Simula a busca dos dados de uma área do dashboard num back-end real:
- * assíncrona, cancelável e sujeita a filtros globais (período/filial).
- *
- * - `loading`: true só na primeira carga de uma área (sem dado prévio pra
- *   mostrar — é quando o skeleton completo faz sentido).
- * - `refreshing`: true quando já existe dado na tela e um filtro mudou —
- *   é quando queremos manter o conteúdo anterior visível (stale-while-
- *   revalidate) em vez de re-mostrar skeleton.
- *
- * Quando o back-end real existir, só o corpo do `buscar` abaixo muda
- * (troca o setTimeout por um fetch); o resto do hook continua igual.
- */
+// simula a busca dos dados do dashboard (por enquanto é só um setTimeout, sem back-end).
+// loading = primeira carga da área (mostra skeleton inteiro)
+// refreshing = já tinha dado na tela e um filtro mudou (mantém o conteúdo antigo visível)
 export function useDashboardData(areaId: string, filtros: FiltrosDashboard) {
   const [dados, setDados] = useState<DadosDashboard | null>(null);
   const [loading, setLoading] = useState(true);

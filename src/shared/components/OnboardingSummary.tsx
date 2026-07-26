@@ -11,12 +11,7 @@ export interface OnboardingSummaryProps {
   acessosAutomaticos: AcessoAutomatico[];
 }
 
-/**
- * Resumo humanizado do onboarding, exibido assim que a automação termina.
- * É aqui que o e-mail gerado, o setor, o gestor e os acessos concedidos
- * ficam visíveis para quem está fazendo o onboarding — sem precisar abrir
- * o Microsoft 365 admin center para conferir.
- */
+// resumo do onboarding exibido quando a automação termina, pra não precisar abrir o admin center pra conferir
 export default function OnboardingSummary({
   nome,
   email,

@@ -9,9 +9,7 @@ interface ToggleSwitchProps {
   suggested?: boolean;
 }
 
-/**
- * Toggle switch acessível (botão de ativar/desativar).
- */
+// toggle switch acessível (botão de ativar/desativar)
 export default function ToggleSwitch({ checked, onChange, label, description, icon: Icon, suggested }: ToggleSwitchProps) {
   return (
     <label className="flex items-center justify-between gap-3 rounded-lg border border-border px-3.5 py-3 cursor-pointer hover:border-primary/40 transition-colors">

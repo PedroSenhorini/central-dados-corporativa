@@ -1,10 +1,6 @@
 import type { CategoriaCompra, StatusCompra, UrgenciaCompra } from '../../../shared/types/database.js';
 
-/**
- * Colunas do kanban de solicitações de compra. 'comprado' e 'recusado' são
- * as etapas finais — ao entrar em qualquer uma delas a solicitação para de
- * contar como "em aberto" nos indicadores.
- */
+// colunas do kanban - comprado/recusado são as etapas finais (para de contar como "em aberto")
 export const COLUNAS_COMPRA: { id: StatusCompra; titulo: string }[] = [
   { id: 'solicitado', titulo: 'Solicitado' },
   { id: 'em_cotacao', titulo: 'Em Cotação' },

@@ -7,10 +7,7 @@ interface FiltrosBarraProps {
   desabilitado: boolean;
 }
 
-/**
- * Filtros globais da página: qualquer mudança aqui reflete nos KPIs e
- * nos dois gráficos ao mesmo tempo (ver useDashboardData/aplicarFiltros).
- */
+// filtros globais da página — muda aqui e reflete nos KPIs e nos dois gráficos
 function FiltrosBarra({ filtros, onChange, desabilitado }: FiltrosBarraProps) {
   return (
     <div className="flex flex-wrap items-center gap-3">

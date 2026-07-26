@@ -35,7 +35,7 @@ export default function NovaSolicitacaoModal({ onFechar, onCriar }: NovaSolicita
   const [descricao, setDescricao] = useState('');
   const [salvando, setSalvando] = useState(false);
 
-  const podeSalvar = Boolean(item.trim().length > 1 && Number(quantidade) > 0 && !salvando);
+  const podeSalvar = item.trim().length > 1 && quantidade > 0 && !salvando;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,7 +45,7 @@ export default function NovaSolicitacaoModal({ onFechar, onCriar }: NovaSolicita
       item: item.trim(),
       categoria,
       descricao: descricao.trim() || null,
-      quantidade: Number(quantidade),
+      quantidade,
       valor_estimado: valorEstimado ? Number(valorEstimado) : null,
       urgencia,
       justificativa: justificativa.trim() || null,

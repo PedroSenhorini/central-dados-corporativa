@@ -41,15 +41,13 @@ export default function AutomacaoRH() {
     [nome, setor]
   );
 
-  // Ao trocar de setor, os cargos/gestores disponíveis mudam — evita
-  // deixar selecionado um cargo ou gestor que não pertence ao novo setor.
+  // troca o setor -> zera cargo e gestor, que dependem dele
   useEffect(() => {
     setCargo('');
     setGestor('');
   }, [setorId]);
 
-  // Ao trocar de cargo, pré-marca as licenças sugeridas para esse cargo.
-  // O usuário ainda pode ligar/desligar qualquer uma manualmente depois.
+  // troca o cargo -> pre-marca as licenças sugeridas (o usuário ainda pode mudar depois)
   useEffect(() => {
     const sugeridas = LICENCAS_SUGERIDAS_POR_CARGO[cargo] ?? [];
     setLicenses(
@@ -73,8 +71,7 @@ export default function AutomacaoRH() {
     timers.current.forEach(clearTimeout);
     timers.current = [];
 
-    // Guarda uma "foto" dos dados no momento do envio, para o resumo final
-    // não mudar caso a pessoa continue mexendo no formulário durante a execução.
+    // guarda uma "foto" dos dados agora, pra não mudar o resumo se a pessoa mexer no form depois
     setResumo({
       nome: nome.trim(),
       email: emailPreview,

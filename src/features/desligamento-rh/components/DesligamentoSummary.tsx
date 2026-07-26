@@ -8,10 +8,7 @@ export interface DesligamentoSummaryProps {
   licencasRevogadas: string[];
 }
 
-/**
- * Resumo exibido ao final da automação de desligamento — confirma que o
- * acesso à Central de Dados foi bloqueado e o que mais foi revogado.
- */
+// mostra o resumo no final do desligamento, confirmando o que foi bloqueado/revogado
 export default function DesligamentoSummary({
   nome,
   cargo,

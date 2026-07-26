@@ -1,8 +1,7 @@
 import type { DragEvent } from 'react';
 import { Clock, User } from 'lucide-react';
 import { calcularDiasEmAberto, calcularSituacaoSla, SLA_LABELS, SETORES_VAGA, type SituacaoSla } from '../data/constants.js';
-import type { PrioridadeVaga } from '../../../shared/types/database.js';
-import type { VagaComRelacoes } from '../../../shared/types/database.js';
+import type { PrioridadeVaga, VagaComRelacoes } from '../../../shared/types/database.js';
 
 const SLA_ESTILOS: Record<SituacaoSla, string> = {
   'no-prazo': 'text-success bg-success/10',

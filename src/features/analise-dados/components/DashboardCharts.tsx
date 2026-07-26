@@ -17,12 +17,8 @@ interface DashboardChartsProps {
   graficoBarra: GraficoDef;
 }
 
-/**
- * Isolado em componente próprio (e carregado via React.lazy na página)
- * para que o bundle do Recharts só entre no chunk baixado quando esta
- * seção realmente precisa renderizar, e para poder memoizar sem
- * re-renderizar os KPIs junto.
- */
+// componente separado (e carregado com React.lazy na página) pra o bundle do
+// Recharts só baixar quando essa parte realmente precisa aparecer
 function DashboardCharts({ graficoLinha, graficoBarra }: DashboardChartsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

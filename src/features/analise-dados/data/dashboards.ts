@@ -1,20 +1,8 @@
 import { LayoutDashboard, Factory, Headphones, TrendingUp, ShoppingCart, Cpu, Users, Megaphone } from 'lucide-react';
 import type { AreaDashboard } from './types.js';
 
-/**
- * Dashboards por área da empresa.
- *
- * Cada área tem seus próprios KPIs e gráficos. Para adicionar uma nova
- * área (ex: Logística, Qualidade), basta acrescentar um objeto aqui —
- * a página renderiza tudo a partir desta lista, sem mudar componente.
- *
- * Estrutura de cada área:
- * - id / label / icon: identificação e exibição no seletor
- * - descricao: subtítulo mostrado no topo da página
- * - kpis: cards de indicadores (mesmo formato do KpiCard)
- * - graficoLinha / graficoBarra: título, subtítulo, chave do eixo X,
- *   chave do valor e a série de dados
- */
+// lista de dashboards por área da empresa. pra adicionar uma área nova (ex: Logística)
+// é só colocar mais um objeto aqui, a página já renderiza tudo sozinha
 export const AREAS_DASHBOARD: AreaDashboard[] = [
   {
     id: 'geral',

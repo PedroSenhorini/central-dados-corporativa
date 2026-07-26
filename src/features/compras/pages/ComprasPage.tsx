@@ -38,11 +38,9 @@ export default function ComprasPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const podeArrastar = () => podeGerenciar;
-
   const moverSolicitacao = async (id: string, novoStatus: StatusCompra) => {
     const solicitacao = solicitacoes.find((s) => s.id === id);
-    if (!solicitacao || solicitacao.status === novoStatus || !podeArrastar()) return;
+    if (!solicitacao || solicitacao.status === novoStatus || !podeGerenciar) return;
 
     const patch = { status: novoStatus, updated_at: new Date().toISOString() };
 
@@ -168,7 +166,7 @@ export default function ComprasPage() {
                       <SolicitacaoCard
                         key={solicitacao.id}
                         solicitacao={solicitacao}
-                        arrastavel={podeArrastar()}
+                        arrastavel={podeGerenciar}
                         onDragStart={handleDragStart}
                       />
                     ))}

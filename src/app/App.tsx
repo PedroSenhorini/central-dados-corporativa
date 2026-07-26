@@ -36,9 +36,11 @@ function BuscaGlobal() {
   const [termo, setTermo] = useState('');
   const [aberto, setAberto] = useState(false);
 
-  const resultados = termo.trim()
-    ? itens.filter((item) => item.label.toLowerCase().includes(termo.trim().toLowerCase()))
-    : [];
+  let resultados: typeof itens = [];
+  const termoBusca = termo.trim();
+  if (termoBusca) {
+    resultados = itens.filter((item) => item.label.toLowerCase().includes(termoBusca.toLowerCase()));
+  }
 
   const irPara = (to: string) => {
     navigate(to);

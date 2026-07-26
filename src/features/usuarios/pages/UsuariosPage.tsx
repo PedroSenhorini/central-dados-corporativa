@@ -7,7 +7,8 @@ import type { Papel, ProfileRow } from '../../../shared/types/database.js';
 
 type UsuarioRow = Pick<ProfileRow, 'id' | 'nome' | 'empresa' | 'cargo' | 'papel' | 'created_at'>;
 
-const PAPEIS = [...AREAS_DASHBOARD.map((a) => ({ id: a.id, label: a.label })), { id: 'admin', label: 'Admin' }];
+const papeisDeArea = AREAS_DASHBOARD.map((a) => ({ id: a.id, label: a.label }));
+const PAPEIS = [...papeisDeArea, { id: 'admin', label: 'Admin' }];
 
 export default function UsuariosPage() {
   const { user } = useAuth();
