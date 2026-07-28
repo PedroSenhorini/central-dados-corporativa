@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useForm, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertTriangle, Siren } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Siren } from 'lucide-react';
 import { visitaSchema, type VisitaSchema } from '../schemas/visitaSchema.js';
 import { criarChecklistPadrao } from '../data/checklistPadrao.js';
-import { ChecklistSection } from '../components/ChecklistSection.js';
-import { TrocasSection } from '../components/TrocasSection.js';
+import { ETAPAS } from '../data/etapas.js';
+import { EtapaChecklist } from '../components/EtapaChecklist.js';
 import { AssinaturaSection } from '../components/AssinaturaSection.js';
 
 const valoresIniciais: VisitaSchema = {
@@ -44,8 +44,38 @@ function ResumoAntesDeAssinar({ control }: { control: ReturnType<typeof useForm<
   );
 }
 
+function StepPills({ etapaAtual, onIrPara }: { etapaAtual: number; onIrPara: (indice: number) => void }) {
+  return (
+    <div className="flex gap-1.5 overflow-x-auto pb-1">
+      {ETAPAS.map((etapa, indice) => {
+        const Icone = etapa.icone;
+        const ativa = indice === etapaAtual;
+        const concluida = indice < etapaAtual;
+        return (
+          <button
+            key={etapa.id}
+            type="button"
+            onClick={() => onIrPara(indice)}
+            className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+              ativa
+                ? 'bg-ink text-white'
+                : concluida
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'bg-slate-100 text-slate-500'
+            }`}
+          >
+            <Icone size={13} />
+            {etapa.titulo}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AcademiasDrakosPage() {
   const [enviado, setEnviado] = useState(false);
+  const [etapaAtual, setEtapaAtual] = useState(0);
 
   const { control, handleSubmit, formState, reset } = useForm<VisitaSchema>({
     resolver: zodResolver(visitaSchema),
@@ -59,6 +89,7 @@ export default function AcademiasDrakosPage() {
 
   function handleNovaVisita() {
     reset(valoresIniciais);
+    setEtapaAtual(0);
     setEnviado(false);
   }
 
@@ -80,6 +111,10 @@ export default function AcademiasDrakosPage() {
     );
   }
 
+  const etapa = ETAPAS[etapaAtual];
+  const ehUltimaEtapa = etapaAtual === ETAPAS.length - 1;
+  const ehPrimeiraEtapa = etapaAtual === 0;
+
   return (
     <div className="mx-auto flex max-w-md flex-col gap-4">
       <div>
@@ -87,52 +122,86 @@ export default function AcademiasDrakosPage() {
         <h1 className="font-display text-xl font-semibold text-ink2">Nova visita técnica</h1>
       </div>
 
+      <StepPills etapaAtual={etapaAtual} onIrPara={setEtapaAtual} />
+      <p className="-mt-1 px-1 text-xs text-slate-400">
+        Etapa {etapaAtual + 1} de {ETAPAS.length} · {etapa.titulo}
+      </p>
+
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <section className="flex flex-col gap-3 rounded-xl bg-white p-4 shadow-sm">
-          <Controller
-            control={control}
-            name="tecnicoNome"
-            render={({ field }) => (
-              <input
-                {...field}
-                placeholder="Seu nome"
-                className="w-full rounded-md border border-slate-300 p-2 text-sm"
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="academiaNome"
-            render={({ field }) => (
-              <input
-                {...field}
-                placeholder="Academia visitada"
-                className="w-full rounded-md border border-slate-300 p-2 text-sm"
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="dataVisita"
-            render={({ field }) => (
-              <input {...field} type="date" className="w-full rounded-md border border-slate-300 p-2 text-sm" />
-            )}
-          />
-        </section>
+        {etapa.id === 'intro' && (
+          <section className="flex flex-col gap-3 rounded-xl bg-white p-4 shadow-sm">
+            <Controller
+              control={control}
+              name="tecnicoNome"
+              render={({ field }) => (
+                <input
+                  {...field}
+                  placeholder="Seu nome"
+                  className="w-full rounded-md border border-slate-300 p-2 text-sm"
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="academiaNome"
+              render={({ field }) => (
+                <input
+                  {...field}
+                  placeholder="Academia visitada"
+                  className="w-full rounded-md border border-slate-300 p-2 text-sm"
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="dataVisita"
+              render={({ field }) => (
+                <input {...field} type="date" className="w-full rounded-md border border-slate-300 p-2 text-sm" />
+              )}
+            />
+          </section>
+        )}
 
-        <ChecklistSection control={control} />
-        <TrocasSection control={control} />
+        {etapa.categoria && <EtapaChecklist control={control} categoria={etapa.categoria} />}
 
-        <ResumoAntesDeAssinar control={control} />
-        <AssinaturaSection control={control} />
+        {etapa.id === 'assinatura' && (
+          <>
+            <ResumoAntesDeAssinar control={control} />
+            <AssinaturaSection control={control} />
+          </>
+        )}
 
-        <button
-          type="submit"
-          disabled={formState.isSubmitting}
-          className="rounded-lg bg-emerald-600 py-3 text-center font-semibold text-white active:bg-emerald-700"
-        >
-          Finalizar visita
-        </button>
+        <div className="flex gap-3">
+          {!ehPrimeiraEtapa && (
+            <button
+              type="button"
+              onClick={() => setEtapaAtual((v) => v - 1)}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-300 py-3 text-sm font-medium text-slate-600"
+            >
+              <ArrowLeft size={16} /> Voltar
+            </button>
+          )}
+
+          {!ehUltimaEtapa && (
+            <button
+              type="button"
+              onClick={() => setEtapaAtual((v) => v + 1)}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-ink py-3 text-sm font-medium text-white"
+            >
+              Avançar <ArrowRight size={16} />
+            </button>
+          )}
+
+          {ehUltimaEtapa && (
+            <button
+              type="submit"
+              disabled={formState.isSubmitting}
+              className="flex-1 rounded-lg bg-emerald-600 py-3 text-center font-semibold text-white active:bg-emerald-700"
+            >
+              Finalizar visita
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

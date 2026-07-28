@@ -1,21 +1,30 @@
 import { Controller, useFieldArray, type Control } from 'react-hook-form';
 import { Plus, Trash2 } from 'lucide-react';
 import type { VisitaSchema } from '../schemas/visitaSchema.js';
+import type { CategoriaEtapa } from '../types.js';
 import { ImageInput } from './ImageInput.js';
 import { gerarId } from '../utils/id.js';
 
 interface TrocasSectionProps {
   control: Control<VisitaSchema>;
+  categoria: CategoriaEtapa;
 }
 
-export function TrocasSection({ control }: TrocasSectionProps) {
+export function TrocasSection({ control, categoria }: TrocasSectionProps) {
   const { fields, append, remove } = useFieldArray({ control, name: 'trocas' });
+
+  const trocasDaEtapa = fields
+    .map((field, index) => ({ field, index }))
+    .filter(({ field }) => field.categoria === categoria);
 
   function handleAdicionarTroca() {
     append({
       id: gerarId(),
+      categoria,
       equipamento: '',
       motivo: '',
+      numeroSerieAntigo: '',
+      numeroSerieNovo: '',
       fotoAntes: null as unknown as File,
       fotoDepois: null as unknown as File,
     });
@@ -34,14 +43,14 @@ export function TrocasSection({ control }: TrocasSectionProps) {
         </button>
       </div>
 
-      {fields.length === 0 && (
-        <p className="text-sm text-slate-400">Nenhuma troca registrada nessa visita.</p>
+      {trocasDaEtapa.length === 0 && (
+        <p className="text-sm text-slate-400">Nenhuma troca registrada nessa etapa.</p>
       )}
 
-      {fields.map((field, index) => (
+      {trocasDaEtapa.map(({ field, index }, ordem) => (
         <div key={field.id} className="flex flex-col gap-3 rounded-lg border border-slate-200 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-700">Troca {index + 1}</span>
+            <span className="text-sm font-medium text-slate-700">Troca {ordem + 1}</span>
             <button type="button" onClick={() => remove(index)} className="text-red-500">
               <Trash2 size={16} />
             </button>
@@ -70,6 +79,31 @@ export function TrocasSection({ control }: TrocasSectionProps) {
               />
             )}
           />
+
+          <div className="grid grid-cols-2 gap-3">
+            <Controller
+              control={control}
+              name={`trocas.${index}.numeroSerieAntigo`}
+              render={({ field: serieField }) => (
+                <input
+                  {...serieField}
+                  placeholder="Nº série (antigo)"
+                  className="w-full rounded-md border border-slate-300 p-2 text-sm"
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name={`trocas.${index}.numeroSerieNovo`}
+              render={({ field: serieField }) => (
+                <input
+                  {...serieField}
+                  placeholder="Nº série (novo)"
+                  className="w-full rounded-md border border-slate-300 p-2 text-sm"
+                />
+              )}
+            />
+          </div>
 
           <div className="grid grid-cols-2 gap-3">
             <Controller
