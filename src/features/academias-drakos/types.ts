@@ -1,5 +1,7 @@
 export type StatusItem = 'ok' | 'atencao' | 'nao_aplica';
 
+export type CategoriaEtapa = 'rede' | 'perifericos' | 'computadores' | 'cameras';
+
 export interface Foto {
   id: string;
   arquivo: File;
@@ -9,6 +11,7 @@ export interface Foto {
 export interface ItemChecklist {
   id: string;
   titulo: string;
+  categoria: CategoriaEtapa;
   status: StatusItem | null;
   urgente: boolean;
   precisaSupervisor: boolean;
@@ -18,8 +21,11 @@ export interface ItemChecklist {
 
 export interface TrocaEquipamento {
   id: string;
+  categoria: CategoriaEtapa;
   equipamento: string;
   motivo: string;
+  numeroSerieAntigo: string;
+  numeroSerieNovo: string;
   fotoAntes: File | null;
   fotoDepois: File | null;
 }

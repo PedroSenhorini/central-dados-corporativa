@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const statusSchema = z.enum(['ok', 'atencao', 'nao_aplica']).nullable();
+const categoriaSchema = z.enum(['rede', 'perifericos', 'computadores', 'cameras']);
 
 const fotoSchema = z.object({
   id: z.string(),
@@ -11,6 +12,7 @@ const fotoSchema = z.object({
 const itemChecklistSchema = z.object({
   id: z.string(),
   titulo: z.string(),
+  categoria: categoriaSchema,
   status: statusSchema,
   urgente: z.boolean(),
   precisaSupervisor: z.boolean(),
@@ -20,8 +22,11 @@ const itemChecklistSchema = z.object({
 
 const trocaSchema = z.object({
   id: z.string(),
+  categoria: categoriaSchema,
   equipamento: z.string().min(1, 'Informe o equipamento'),
   motivo: z.string().min(1, 'Informe o motivo da troca'),
+  numeroSerieAntigo: z.string().min(1, 'Informe o número de série do aparelho antigo'),
+  numeroSerieNovo: z.string().min(1, 'Informe o número de série do aparelho novo'),
   fotoAntes: z.instanceof(File, { message: 'Foto do "antes" é obrigatória' }),
   fotoDepois: z.instanceof(File, { message: 'Foto do "depois" é obrigatória' }),
 });
