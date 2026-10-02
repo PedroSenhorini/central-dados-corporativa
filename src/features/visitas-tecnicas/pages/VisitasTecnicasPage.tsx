@@ -10,7 +10,7 @@ import { AssinaturaSection } from '../components/AssinaturaSection.js';
 
 const valoresIniciais: VisitaSchema = {
   tecnicoNome: '',
-  academiaNome: '',
+  localNome: '',
   dataVisita: new Date().toISOString().slice(0, 10),
   checklistGeral: criarChecklistPadrao(),
   trocas: [],
@@ -143,11 +143,11 @@ export default function VisitasTecnicasPage() {
             />
             <Controller
               control={control}
-              name="academiaNome"
+              name="localNome"
               render={({ field }) => (
                 <input
                   {...field}
-                  placeholder="Academia visitada"
+                  placeholder="Local visitado (cliente, unidade ou endereço)"
                   className="w-full rounded-md border border-slate-300 p-2 text-sm"
                 />
               )}

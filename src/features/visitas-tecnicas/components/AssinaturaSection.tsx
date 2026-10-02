@@ -22,7 +22,7 @@ export function AssinaturaSection({ control }: AssinaturaSectionProps) {
         render={({ field }) => (
           <input
             {...field}
-            placeholder="Nome do gestor da academia"
+            placeholder="Nome do responsável pelo local"
             className="w-full rounded-md border border-slate-300 p-2 text-sm"
           />
         )}

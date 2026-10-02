@@ -33,7 +33,7 @@ const trocaSchema = z.object({
 
 export const visitaSchema = z.object({
   tecnicoNome: z.string().min(1, 'Informe seu nome'),
-  academiaNome: z.string().min(1, 'Informe a academia'),
+  localNome: z.string().min(1, 'Informe o local visitado'),
   dataVisita: z.string().min(1),
   checklistGeral: z.array(itemChecklistSchema),
   trocas: z.array(trocaSchema),
