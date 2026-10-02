@@ -114,7 +114,7 @@ export default function VagasRhPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-xl font-semibold text-ink2">Vagas (RH)</h1>
+          <h1 className="text-[22px] font-semibold text-ink2">Vagas (RH)</h1>
           <p className="text-sm text-muted mt-0.5">
             Kanban de recrutamento com controle de SLA por vaga.
           </p>
@@ -123,7 +123,7 @@ export default function VagasRhPage() {
           <button
             type="button"
             onClick={() => setModalAberto(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-sm font-medium text-white hover:bg-primary-hover transition-colors shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-md bg-ink2 px-3 py-2 text-[13px] font-medium text-white hover:bg-ink2/90 transition-colors shrink-0"
           >
             <Plus size={15} />
             Nova vaga
@@ -141,23 +141,23 @@ export default function VagasRhPage() {
       {!erro && (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-surface border border-border rounded-xl p-4 shadow-card">
+            <div className="bg-surface border border-border rounded-xl p-4">
               <p className="text-[13px] font-medium text-muted">Vagas abertas</p>
-              <p className="font-display text-2xl font-semibold text-ink2 mt-1">{totalAbertas}</p>
+              <p className="text-[24px] leading-none font-semibold tracking-tight tabular-nums text-ink2 mt-1">{totalAbertas}</p>
             </div>
-            <div className="bg-surface border border-border rounded-xl p-4 shadow-card">
+            <div className="bg-surface border border-border rounded-xl p-4">
               <p className="text-[13px] font-medium text-muted">SLA vencido</p>
               <p
-                className={`font-display text-2xl font-semibold mt-1 ${
+                className={`text-[24px] leading-none font-semibold tracking-tight tabular-nums mt-1 ${
                   totalVencidas > 0 ? 'text-red-600' : 'text-ink2'
                 }`}
               >
                 {totalVencidas}
               </p>
             </div>
-            <div className="bg-surface border border-border rounded-xl p-4 shadow-card">
+            <div className="bg-surface border border-border rounded-xl p-4">
               <p className="text-[13px] font-medium text-muted">Tempo médio de contratação</p>
-              <p className="font-display text-2xl font-semibold text-ink2 mt-1">
+              <p className="text-[24px] leading-none font-semibold tracking-tight tabular-nums text-ink2 mt-1">
                 {tempoMedioContratacao !== null ? `${tempoMedioContratacao} dias` : '—'}
               </p>
             </div>
@@ -174,7 +174,7 @@ export default function VagasRhPage() {
                   className="flex flex-col gap-3 bg-canvas border border-border rounded-xl p-3 min-h-[16rem]"
                 >
                   <div className="flex items-center justify-between px-1">
-                    <p className="text-[12px] font-semibold uppercase tracking-wide text-muted">
+                    <p className="text-[12px] font-semibold text-muted">
                       {coluna.titulo}
                     </p>
                     <span className="text-[11px] text-muted">{vagasDaColuna.length}</span>

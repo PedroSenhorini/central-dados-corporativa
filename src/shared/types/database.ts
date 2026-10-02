@@ -14,6 +14,14 @@ export type CategoriaCompra = 'equipamento' | 'material' | 'software' | 'servico
 export type UrgenciaCompra = 'baixa' | 'media' | 'alta' | 'critica';
 export type StatusCompra = 'solicitado' | 'em_cotacao' | 'aprovado' | 'comprado' | 'recusado';
 
+export type CategoriaComunicado = 'geral' | 'diretoria' | 'rh' | 'ti' | 'eventos';
+export type TipoSolicitacaoRh = 'ferias' | 'declaracao' | 'atualizacao_cadastral' | 'outro';
+export type StatusSolicitacaoRh = 'pendente' | 'aprovada' | 'recusada' | 'concluida';
+export type CategoriaChamado = 'equipamento' | 'acesso' | 'sistema' | 'rede' | 'outro';
+export type PrioridadeChamado = 'baixa' | 'media' | 'alta';
+export type StatusChamado = 'aberto' | 'em_atendimento' | 'aguardando_usuario' | 'resolvido';
+export type CategoriaDocumento = 'politica' | 'manual' | 'procedimento' | 'modelo' | 'outro';
+
 /**
  * `type` (não `interface`) de propósito: interfaces não satisfazem o
  * `Record<string, unknown>` que o supabase-js exige em `GenericTable['Row']`
@@ -28,6 +36,7 @@ export type ProfileRow = {
   papel: Papel;
   ativo: boolean;
   data_desligamento: string | null;
+  data_nascimento: string | null;
   created_at: string;
 };
 
@@ -65,6 +74,63 @@ export type SolicitacaoCompraRow = {
   updated_at: string;
 };
 
+export type ComunicadoRow = {
+  id: string;
+  titulo: string;
+  corpo: string;
+  categoria: CategoriaComunicado;
+  fixado: boolean;
+  autor_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ComunicadoLeituraRow = {
+  comunicado_id: string;
+  user_id: string;
+  lido_em: string;
+};
+
+export type SolicitacaoRhRow = {
+  id: string;
+  tipo: TipoSolicitacaoRh;
+  descricao: string | null;
+  data_inicio: string | null;
+  data_fim: string | null;
+  status: StatusSolicitacaoRh;
+  resposta: string | null;
+  solicitante_id: string | null;
+  responsavel_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ChamadoTiRow = {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  categoria: CategoriaChamado;
+  prioridade: PrioridadeChamado;
+  status: StatusChamado;
+  solicitante_id: string | null;
+  responsavel_id: string | null;
+  resolvido_em: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type DocumentoRow = {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  categoria: CategoriaDocumento;
+  arquivo_path: string;
+  arquivo_nome: string;
+  tamanho_bytes: number | null;
+  autor_id: string | null;
+  created_at: string;
+};
+
 type TableDef<Row, Insert, Update> = { Row: Row; Insert: Insert; Update: Update; Relationships: [] };
 
 export interface Database {
@@ -72,7 +138,7 @@ export interface Database {
     Tables: {
       profiles: TableDef<
         ProfileRow,
-        Omit<ProfileRow, 'created_at' | 'papel' | 'ativo'> & { papel?: Papel; ativo?: boolean },
+        Omit<ProfileRow, 'created_at' | 'papel' | 'ativo' | 'data_nascimento'> & { papel?: Papel; ativo?: boolean; data_nascimento?: string | null },
         Partial<Omit<ProfileRow, 'id'>>
       >;
       vagas_rh: TableDef<
@@ -87,9 +153,42 @@ export interface Database {
           Partial<Pick<SolicitacaoCompraRow, 'status' | 'categoria' | 'urgencia' | 'quantidade' | 'responsavel_compras_id'>>,
         Partial<Omit<SolicitacaoCompraRow, 'id'>>
       >;
+      comunicados: TableDef<
+        ComunicadoRow,
+        Pick<ComunicadoRow, 'titulo' | 'corpo' | 'autor_id'> & Partial<Pick<ComunicadoRow, 'categoria' | 'fixado'>>,
+        Partial<Omit<ComunicadoRow, 'id' | 'created_at'>>
+      >;
+      comunicados_leituras: TableDef<
+        ComunicadoLeituraRow,
+        Pick<ComunicadoLeituraRow, 'comunicado_id' | 'user_id'>,
+        never
+      >;
+      solicitacoes_rh: TableDef<
+        SolicitacaoRhRow,
+        Pick<SolicitacaoRhRow, 'tipo' | 'solicitante_id'> &
+          Partial<Pick<SolicitacaoRhRow, 'descricao' | 'data_inicio' | 'data_fim'>>,
+        Partial<Pick<SolicitacaoRhRow, 'status' | 'resposta' | 'responsavel_id'>>
+      >;
+      chamados_ti: TableDef<
+        ChamadoTiRow,
+        Pick<ChamadoTiRow, 'titulo' | 'solicitante_id'> &
+          Partial<Pick<ChamadoTiRow, 'descricao' | 'categoria' | 'prioridade'>>,
+        Partial<Pick<ChamadoTiRow, 'status' | 'responsavel_id' | 'resolvido_em' | 'prioridade'>>
+      >;
+      documentos: TableDef<
+        DocumentoRow,
+        Omit<DocumentoRow, 'id' | 'created_at' | 'categoria' | 'descricao' | 'tamanho_bytes'> &
+          Partial<Pick<DocumentoRow, 'categoria' | 'descricao' | 'tamanho_bytes'>>,
+        never
+      >;
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      resumo_leituras: {
+        Args: Record<string, never>;
+        Returns: { comunicado_id: string; leituras: number; total_ativos: number }[];
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
@@ -107,4 +206,13 @@ export type VagaComRelacoes = VagaRhRow & {
 
 export type SolicitacaoComRelacoes = SolicitacaoCompraRow & {
   solicitante: PerfilResumo | null;
+};
+
+export type ComunicadoComAutor = ComunicadoRow & { autor: PerfilResumo | null };
+
+export type SolicitacaoRhComRelacoes = SolicitacaoRhRow & { solicitante: PerfilResumo | null };
+
+export type ChamadoComRelacoes = ChamadoTiRow & {
+  solicitante: PerfilResumo | null;
+  responsavel: PerfilResumo | null;
 };

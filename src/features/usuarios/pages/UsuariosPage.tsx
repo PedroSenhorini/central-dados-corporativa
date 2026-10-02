@@ -46,7 +46,7 @@ export default function UsuariosPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="font-display text-xl font-semibold text-ink2">Usuários</h1>
+        <h1 className="text-[22px] font-semibold text-ink2">Usuários</h1>
         <p className="text-sm text-muted mt-0.5">
           Gerencie a área de acesso de cada pessoa da empresa.
         </p>

@@ -23,7 +23,7 @@ export default function RegisterPage() {
   const [confirmarEmail, setConfirmarEmail] = useState(false);
 
   if (isAuthenticated) {
-    return <Navigate to="/analise-dados" replace />;
+    return <Navigate to="/inicio" replace />;
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

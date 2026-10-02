@@ -1,15 +1,20 @@
 import { NavLink } from 'react-router-dom';
 import {
+  Home,
+  Megaphone,
+  Contact,
+  FileText,
+  Palmtree,
+  Headset,
   BarChart3,
   UserCog,
   UserX,
   Users,
   KanbanSquare,
   ShoppingCart,
-  Dumbbell,
+  ClipboardCheck,
   PanelLeftClose,
   PanelLeftOpen,
-  CircleDot,
   type LucideIcon,
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext.js';
@@ -31,19 +36,37 @@ interface NavGroup {
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    titulo: 'Dashboards',
+    titulo: 'Geral',
     itens: [
-      {
-        to: '/analise-dados',
-        label: 'Análise de Dados',
-        description: 'KPIs e indicadores',
-        icon: BarChart3,
-      },
+      { to: '/inicio', label: 'Início', description: 'Resumo do seu dia', icon: Home },
+      { to: '/mural', label: 'Mural', description: 'Comunicados da empresa', icon: Megaphone },
+      { to: '/pessoas', label: 'Pessoas', description: 'Diretório de colaboradores', icon: Contact },
+      { to: '/documentos', label: 'Documentos', description: 'Políticas, manuais e modelos', icon: FileText },
+    ],
+  },
+  {
+    titulo: 'Dashboards',
+    itens: [{ to: '/analise-dados', label: 'Análise de Dados', description: 'KPIs e indicadores', icon: BarChart3 }],
+  },
+  {
+    titulo: 'Solicitações',
+    itens: [
+      { to: '/solicitacoes-rh', label: 'Solicitações de RH', description: 'Férias, declarações e cadastro', icon: Palmtree },
+      { to: '/chamados-ti', label: 'Chamados de TI', description: 'Suporte a equipamentos e sistemas', icon: Headset },
+      { to: '/compras', label: 'Compras', description: 'Solicitação e orçamento de compra', icon: ShoppingCart },
     ],
   },
   {
     titulo: 'Operação',
     itens: [
+      { to: '/vagas-rh', label: 'Vagas (RH)', description: 'Kanban e SLA de contratação', icon: KanbanSquare },
+      {
+        to: '/visitas-tecnicas',
+        label: 'Visitas Técnicas',
+        description: 'Vistoria técnica em campo',
+        icon: ClipboardCheck,
+        modulo: 'visitas-tecnicas',
+      },
       {
         to: '/automacao-rh',
         label: 'Automação de RH',
@@ -52,44 +75,17 @@ export const NAV_GROUPS: NavGroup[] = [
         modulo: 'automacao-rh',
       },
       {
-        to: '/vagas-rh',
-        label: 'Vagas (RH)',
-        description: 'Kanban e SLA de contratação',
-        icon: KanbanSquare,
-      },
-      {
         to: '/desligamento-rh',
         label: 'Desligamento',
         description: 'Bloqueio de acessos e licenças',
         icon: UserX,
         modulo: 'desligamento-rh',
       },
-      {
-        to: '/compras',
-        label: 'Compras',
-        description: 'Solicitação e orçamento de compra',
-        icon: ShoppingCart,
-      },
-      {
-        to: '/academias-drakos',
-        label: 'Academias Drakos',
-        description: 'Vistoria técnica em campo',
-        icon: Dumbbell,
-        modulo: 'academias-drakos',
-      },
     ],
   },
   {
     titulo: 'Administração',
-    itens: [
-      {
-        to: '/usuarios',
-        label: 'Usuários',
-        description: 'Áreas de acesso',
-        icon: Users,
-        modulo: 'usuarios',
-      },
-    ],
+    itens: [{ to: '/usuarios', label: 'Usuários', description: 'Áreas de acesso', icon: Users, modulo: 'usuarios' }],
   },
 ];
 
@@ -99,29 +95,35 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`flex flex-col shrink-0 bg-ink text-white h-screen sticky top-0 transition-all duration-300 ${
-        sidebarOpen ? 'w-64' : 'w-20'
+      className={`flex flex-col shrink-0 bg-surface border-r border-border h-screen sticky top-0 transition-all duration-300 ${
+        sidebarOpen ? 'w-16 md:w-60' : 'w-16'
       }`}
     >
       {/* Marca */}
-      <div className="flex items-center justify-between px-4 h-16 border-b border-ink-border">
+      <div className="flex items-center justify-between gap-2 px-3 h-14">
         {sidebarOpen && (
-          <div className="leading-tight">
-            <p className="font-display font-semibold text-sm tracking-wide">CENTRAL DE DADOS</p>
-            <p className="text-[11px] text-white/50">{profile?.empresa || 'Painel Corporativo'}</p>
+          <div className="hidden md:flex items-center gap-2.5 min-w-0 pl-1">
+            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-ink2 text-white text-[11px] font-semibold shrink-0">
+              CD
+            </span>
+            <div className="leading-tight min-w-0">
+              <p className="text-[13px] font-semibold text-ink2 truncate">Central de Dados</p>
+              <p className="text-[11px] text-muted truncate">{profile?.empresa || 'Painel Corporativo'}</p>
+            </div>
           </div>
         )}
         <button
           onClick={toggleSidebar}
-          className="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-ink-soft transition-colors"
-          aria-label="Recolher menu"
+          className="hidden md:block p-1.5 rounded-md text-muted hover:text-ink2 hover:bg-canvas transition-colors mx-auto"
+          aria-label={sidebarOpen ? 'Recolher menu' : 'Expandir menu'}
         >
-          {sidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+          {sidebarOpen ? <PanelLeftClose size={17} /> : <PanelLeftOpen size={17} />}
         </button>
       </div>
 
       {/* Navegação principal */}
-      <nav className="flex-1 px-3 py-5 space-y-4 overflow-y-auto scroll-slim">
+      {/* Em telas pequenas o menu fica só com ícones, sem empurrar o conteúdo. */}
+      <nav className="flex-1 px-3 py-3 space-y-5 overflow-y-auto scroll-slim">
         {NAV_GROUPS.map((grupo) => {
           const itensVisiveis = grupo.itens.filter((item) =>
             temAcessoAoModulo(profile?.papel, item.modulo)
@@ -129,63 +131,45 @@ export default function Sidebar() {
           if (itensVisiveis.length === 0) return null;
 
           return (
-          <div key={grupo.titulo} className="space-y-1.5">
-            {sidebarOpen && (
-              <p className="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/35">
-                {grupo.titulo}
-              </p>
-            )}
-            {itensVisiveis.map(({ to, label, description, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  `group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                    isActive
-                      ? 'bg-accent/15 text-white'
-                      : 'text-white/65 hover:bg-ink-soft hover:text-white'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <span
-                      className={`flex items-center justify-center w-8 h-8 rounded-md shrink-0 ${
-                        isActive ? 'bg-accent text-white' : 'bg-ink-soft text-white/70'
-                      }`}
-                    >
-                      <Icon size={17} />
-                    </span>
-                    {sidebarOpen && (
-                      <span className="min-w-0">
-                        <span className="block text-sm font-medium truncate">{label}</span>
-                        <span className="block text-[11px] text-white/40 truncate">{description}</span>
-                      </span>
-                    )}
-                  </>
-                )}
-              </NavLink>
-            ))}
-          </div>
+            <div key={grupo.titulo} className="space-y-0.5">
+              {sidebarOpen && (
+                <p className="hidden md:block px-2 pb-1.5 text-[11px] font-medium text-muted/80">{grupo.titulo}</p>
+              )}
+              {itensVisiveis.map(({ to, label, description, icon: Icon }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  title={sidebarOpen ? description : label}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[13px] transition-colors ${
+                      sidebarOpen ? 'justify-center md:justify-start' : 'justify-center'
+                    } ${
+                      isActive
+                        ? 'bg-canvas text-ink2 font-medium ring-1 ring-inset ring-border'
+                        : 'text-muted hover:bg-canvas hover:text-ink2'
+                    }`
+                  }
+                >
+                  <Icon size={16} className="shrink-0" />
+                  {sidebarOpen && <span className="hidden md:inline truncate">{label}</span>}
+                </NavLink>
+              ))}
+            </div>
           );
         })}
       </nav>
 
       {/* Status do sistema */}
-      <div className="px-4 py-4 border-t border-ink-border">
-        <div className="flex items-center gap-2 text-[12px] text-white/60">
-          <CircleDot size={14} className="text-success" />
-          {sidebarOpen ? (
-            <span>
+      <div className="px-4 py-3 border-t border-border">
+        <div className={`flex items-center gap-2 text-[12px] text-muted ${sidebarOpen ? 'justify-center md:justify-start' : 'justify-center'}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-success shrink-0" />
+          {sidebarOpen && (
+            <span className="hidden md:inline">
               Sistemas operacionais
               {runningAutomations > 0 && (
-                <span className="ml-1 text-accent">· {runningAutomations} em execução</span>
+                <span className="ml-1 text-primary">· {runningAutomations} em execução</span>
               )}
             </span>
-          ) : (
-            runningAutomations > 0 && (
-              <span className="w-2 h-2 rounded-full bg-accent inline-block" />
-            )
           )}
         </div>
       </div>

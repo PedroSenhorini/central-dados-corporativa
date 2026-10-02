@@ -1,13 +1,21 @@
-import { useMemo, useState } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, Search, Bell } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
+import { LogOut, Bell } from 'lucide-react';
 import Sidebar, { NAV_GROUPS } from '../shared/components/Sidebar.js';
+import CommandPalette from '../shared/components/CommandPalette.js';
+import Pill from '../shared/components/Pill.js';
+import Inicio from '../features/inicio/pages/InicioPage.js';
+import Mural from '../features/mural/pages/MuralPage.js';
+import Pessoas from '../features/pessoas/pages/PessoasPage.js';
+import Documentos from '../features/documentos/pages/DocumentosPage.js';
+import SolicitacoesRh from '../features/solicitacoes-rh/pages/SolicitacoesRhPage.js';
+import ChamadosTi from '../features/chamados-ti/pages/ChamadosTiPage.js';
 import AnaliseDados from '../features/analise-dados/pages/AnaliseDadosPage.js';
 import AutomacaoRH from '../features/automacao-rh/pages/AutomacaoRhPage.js';
 import VagasRh from '../features/vagas-rh/pages/VagasRhPage.js';
 import DesligamentoRH from '../features/desligamento-rh/pages/DesligamentoRhPage.js';
 import Compras from '../features/compras/pages/ComprasPage.js';
-import AcademiasDrakos from '../features/academias-drakos/pages/AcademiasDrakosPage.js';
+import VisitasTecnicas from '../features/visitas-tecnicas/pages/VisitasTecnicasPage.js';
 import Usuarios from '../features/usuarios/pages/UsuariosPage.js';
 import LoginPage from '../features/auth/pages/LoginPage.js';
 import RegisterPage from '../features/auth/pages/RegisterPage.js';
@@ -15,97 +23,69 @@ import AssistantWidget from '../features/assistente/components/AssistantWidget.j
 import ProtectedRoute from './ProtectedRoute.js';
 import RequireRole from './RequireRole.js';
 import { useAuth } from '../shared/context/AuthContext.js';
+import { usePendencias } from '../shared/hooks/usePendencias.js';
+import { iniciais, tempoRelativo } from '../shared/utils/formatacao.js';
 
-const PAGE_TITLES: Record<string, string> = {
-  '/analise-dados': 'Análise de Dados',
-  '/automacao-rh': 'Automação de RH',
-  '/vagas-rh': 'Vagas (RH)',
-  '/desligamento-rh': 'Desligamento',
-  '/compras': 'Compras',
-  '/academias-drakos': 'Academias Drakos',
-  '/usuarios': 'Usuários',
-};
-
-function iniciais(nome: string): string {
-  if (!nome) return '?';
-  const partes = nome.trim().split(/\s+/);
-  return (partes[0][0] + (partes[1]?.[0] ?? '')).toUpperCase();
-}
-
-function BuscaGlobal() {
-  const navigate = useNavigate();
-  const itens = useMemo(() => NAV_GROUPS.flatMap((g) => g.itens), []);
-  const [termo, setTermo] = useState('');
-  const [aberto, setAberto] = useState(false);
-
-  let resultados: typeof itens = [];
-  const termoBusca = termo.trim();
-  if (termoBusca) {
-    resultados = itens.filter((item) => item.label.toLowerCase().includes(termoBusca.toLowerCase()));
-  }
-
-  const irPara = (to: string) => {
-    navigate(to);
-    setTermo('');
-    setAberto(false);
-  };
-
-  return (
-    <div className="relative flex-1 max-w-sm">
-      <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
-      <input
-        type="text"
-        value={termo}
-        onChange={(e) => {
-          setTermo(e.target.value);
-          setAberto(true);
-        }}
-        onFocus={() => setAberto(true)}
-        onBlur={() => setTimeout(() => setAberto(false), 150)}
-        placeholder="Buscar no painel..."
-        className="w-full rounded-lg border border-border bg-canvas pl-9 pr-3 py-1.5 text-sm text-ink2 placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
-      />
-      {aberto && termo.trim() && (
-        <div className="absolute top-full mt-1 w-full bg-surface border border-border rounded-lg shadow-card overflow-hidden z-20">
-          {resultados.length > 0 ? (
-            resultados.map((item) => (
-              <button
-                key={item.to}
-                type="button"
-                onMouseDown={() => irPara(item.to)}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-ink2 hover:bg-canvas transition-colors text-left"
-              >
-                <item.icon size={14} className="text-muted" />
-                {item.label}
-              </button>
-            ))
-          ) : (
-            <p className="px-3 py-2 text-[13px] text-muted">Nada encontrado para "{termo}".</p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
+const PAGE_TITLES: Record<string, string> = Object.fromEntries(
+  NAV_GROUPS.flatMap((g) => g.itens).map((item) => [item.to, item.label])
+);
 
 function NotificacoesSino() {
+  const { pathname } = useLocation();
+  const { pendencias, recarregar } = usePendencias();
   const [aberto, setAberto] = useState(false);
+  const caixaRef = useRef<HTMLDivElement>(null);
+
+  // Recalcula ao trocar de página: a ação pode ter resolvido uma pendência.
+  useEffect(() => {
+    setAberto(false);
+    recarregar();
+  }, [pathname, recarregar]);
+
+  useEffect(() => {
+    if (!aberto) return;
+    const fecharFora = (e: MouseEvent) => {
+      if (!caixaRef.current?.contains(e.target as Node)) setAberto(false);
+    };
+    document.addEventListener('mousedown', fecharFora);
+    return () => document.removeEventListener('mousedown', fecharFora);
+  }, [aberto]);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={caixaRef}>
       <button
         type="button"
         onClick={() => setAberto((v) => !v)}
         title="Notificações"
-        aria-label="Notificações"
-        className="p-1.5 rounded-md text-muted hover:text-ink2 hover:bg-canvas transition-colors"
+        aria-label={`Notificações${pendencias.length ? ` (${pendencias.length})` : ''}`}
+        aria-expanded={aberto}
+        className="relative p-1.5 rounded-md text-muted hover:text-ink2 hover:bg-surface transition-colors"
       >
         <Bell size={17} />
+        {pendencias.length > 0 && (
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 ring-2 ring-canvas" />
+        )}
       </button>
       {aberto && (
-        <div className="absolute right-0 top-full mt-2 w-64 bg-surface border border-border rounded-lg shadow-card p-3 z-20">
-          <p className="text-[13px] font-medium text-ink2 mb-1">Notificações</p>
-          <p className="text-[12px] text-muted">Nenhuma notificação por enquanto.</p>
+        <div className="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-surface border border-border rounded-xl shadow-xl z-20 overflow-hidden">
+          <p className="px-4 py-3 border-b border-border text-[13px] font-semibold text-ink2">Notificações</p>
+          {pendencias.length === 0 ? (
+            <p className="px-4 py-6 text-center text-[13px] text-muted">Tudo em dia por aqui.</p>
+          ) : (
+            <ul className="max-h-80 overflow-y-auto scroll-slim divide-y divide-border">
+              {pendencias.slice(0, 8).map((p) => (
+                <li key={p.id}>
+                  <Link to={p.rota} className="flex items-start gap-2.5 px-4 py-3 hover:bg-canvas transition-colors">
+                    <Pill tom={p.tom}>{p.modulo}</Pill>
+                    <span className="min-w-0">
+                      <span className="block text-[13px] text-ink2 truncate">{p.titulo}</span>
+                      <span className="block text-[12px] text-muted">{tempoRelativo(p.criadoEm)}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </div>
@@ -116,25 +96,22 @@ function Header() {
   const { pathname } = useLocation();
   const { profile, user, signOut } = useAuth();
   const nomeExibido = profile?.nome || user?.email || '';
-  const primeiroNome = nomeExibido.split(' ')[0];
 
   return (
-    <header className="h-16 bg-surface border-b border-border flex items-center gap-4 px-6 sticky top-0 z-10">
-      <p className="text-sm text-muted shrink-0">
-        Central de Dados <span className="mx-1.5 text-border">/</span>{' '}
+    <header className="h-14 bg-canvas/80 backdrop-blur border-b border-border flex items-center gap-4 px-4 sm:px-8 sticky top-0 z-10">
+      <p className="text-[13px] text-muted shrink-0 hidden md:block">
+        Central de Dados <span className="mx-1.5 text-muted/40">/</span>{' '}
         <span className="text-ink2 font-medium">{PAGE_TITLES[pathname] ?? 'Painel'}</span>
       </p>
 
-      <BuscaGlobal />
+      <CommandPalette />
 
-      <div className="flex items-center gap-3 shrink-0 ml-auto">
-        {primeiroNome && (
-          <p className="text-sm text-muted hidden sm:block">
-            Olá, <span className="text-ink2 font-medium">{primeiroNome}</span>
-          </p>
-        )}
+      <div className="flex items-center gap-2 shrink-0 ml-auto">
         <NotificacoesSino />
-        <div className="w-8 h-8 rounded-full bg-primary-soft text-primary flex items-center justify-center text-[13px] font-semibold">
+        <div
+          className="w-7 h-7 rounded-full bg-ink2 text-white flex items-center justify-center text-[11px] font-semibold"
+          title={nomeExibido}
+        >
           {iniciais(nomeExibido)}
         </div>
         <button
@@ -142,7 +119,7 @@ function Header() {
           onClick={signOut}
           title="Sair"
           aria-label="Sair"
-          className="p-1.5 rounded-md text-muted hover:text-ink2 hover:bg-canvas transition-colors"
+          className="p-1.5 rounded-md text-muted hover:text-ink2 hover:bg-surface transition-colors"
         >
           <LogOut size={17} />
         </button>
@@ -157,9 +134,15 @@ function PainelPrincipal() {
       <Sidebar />
       <div className="flex-1 min-w-0 flex flex-col">
         <Header />
-        <main className="flex-1 p-6">
+        <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-8 py-8">
           <Routes>
-            <Route path="/" element={<Navigate to="/analise-dados" replace />} />
+            <Route path="/" element={<Navigate to="/inicio" replace />} />
+            <Route path="/inicio" element={<Inicio />} />
+            <Route path="/mural" element={<Mural />} />
+            <Route path="/pessoas" element={<Pessoas />} />
+            <Route path="/documentos" element={<Documentos />} />
+            <Route path="/solicitacoes-rh" element={<SolicitacoesRh />} />
+            <Route path="/chamados-ti" element={<ChamadosTi />} />
             <Route path="/analise-dados" element={<AnaliseDados />} />
             <Route
               path="/automacao-rh"
@@ -172,10 +155,10 @@ function PainelPrincipal() {
             <Route path="/vagas-rh" element={<VagasRh />} />
             <Route path="/compras" element={<Compras />} />
             <Route
-              path="/academias-drakos"
+              path="/visitas-tecnicas"
               element={
-                <RequireRole modulo="academias-drakos">
-                  <AcademiasDrakos />
+                <RequireRole modulo="visitas-tecnicas">
+                  <VisitasTecnicas />
                 </RequireRole>
               }
             />
@@ -195,6 +178,7 @@ function PainelPrincipal() {
                 </RequireRole>
               }
             />
+            <Route path="*" element={<Navigate to="/inicio" replace />} />
           </Routes>
         </main>
       </div>

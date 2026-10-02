@@ -24,14 +24,18 @@ export default function AnaliseDados() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-xl font-semibold text-ink2">Análise de Dados</h1>
+          <h1 className="text-[22px] font-semibold text-ink2">Análise de Dados</h1>
           <p className="text-sm text-muted mt-0.5">{area?.descricao}</p>
         </div>
         <FiltrosBarra filtros={filtros} onChange={setFiltros} desabilitado={loading} />
       </div>
 
       {/* Seletor de área da empresa */}
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Área da empresa">
+      <div
+        className="flex flex-wrap gap-1 self-start rounded-lg border border-border bg-surface p-1"
+        role="tablist"
+        aria-label="Área da empresa"
+      >
         {AREAS_DASHBOARD.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -39,13 +43,11 @@ export default function AnaliseDados() {
             role="tab"
             aria-selected={id === areaId}
             onClick={() => trocarArea(id)}
-            className={`inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors ${
-              id === areaId
-                ? 'bg-primary border-primary text-white'
-                : 'bg-surface border-border text-muted hover:text-ink2 hover:border-primary/40'
+            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors ${
+              id === areaId ? 'bg-ink2 text-white' : 'text-muted hover:text-ink2 hover:bg-canvas'
             }`}
           >
-            <Icon size={15} />
+            <Icon size={14} />
             {label}
           </button>
         ))}

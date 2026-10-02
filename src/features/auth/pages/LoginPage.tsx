@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [erro, setErro] = useState('');
 
   if (isAuthenticated) {
-    const from = (location.state as { from?: string } | null)?.from ?? '/analise-dados';
+    const from = (location.state as { from?: string } | null)?.from ?? '/inicio';
     return <Navigate to={from} replace />;
   }
 

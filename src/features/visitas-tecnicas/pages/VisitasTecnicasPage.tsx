@@ -73,7 +73,7 @@ function StepPills({ etapaAtual, onIrPara }: { etapaAtual: number; onIrPara: (in
   );
 }
 
-export default function AcademiasDrakosPage() {
+export default function VisitasTecnicasPage() {
   const [enviado, setEnviado] = useState(false);
   const [etapaAtual, setEtapaAtual] = useState(0);
 
@@ -96,7 +96,7 @@ export default function AcademiasDrakosPage() {
   if (enviado) {
     return (
       <div className="mx-auto flex max-w-md flex-col items-center gap-3 py-16 text-center">
-        <h1 className="font-display text-xl font-semibold text-ink2">Visita registrada!</h1>
+        <h1 className="text-[22px] font-semibold text-ink2">Visita registrada!</h1>
         <p className="text-sm text-muted">
           O envio pro backend ainda não existe, isso aqui é só o front por enquanto.
         </p>
@@ -118,8 +118,8 @@ export default function AcademiasDrakosPage() {
   return (
     <div className="mx-auto flex max-w-md flex-col gap-4">
       <div>
-        <p className="text-xs uppercase tracking-wide text-muted">Academias Drakos</p>
-        <h1 className="font-display text-xl font-semibold text-ink2">Nova visita técnica</h1>
+        <p className="text-xs uppercase tracking-wide text-muted">Visitas Técnicas</p>
+        <h1 className="text-[22px] font-semibold text-ink2">Nova visita técnica</h1>
       </div>
 
       <StepPills etapaAtual={etapaAtual} onIrPara={setEtapaAtual} />
