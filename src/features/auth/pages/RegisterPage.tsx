@@ -133,7 +133,8 @@ export default function RegisterPage() {
             ))}
           </select>
           <p className="text-[11px] text-muted">
-            Define quais módulos você vê na plataforma (ex.: só RH acessa a Automação de RH).
+            Define quais módulos você vê na plataforma. RH, Compras e TI têm acesso restrito: você entra
+            como Geral e um administrador libera a área.
           </p>
         </div>
 
