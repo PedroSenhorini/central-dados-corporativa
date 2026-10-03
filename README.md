@@ -1,62 +1,49 @@
 # Central de Dados Corporativa
 
-Intranet corporativa que reúne em um só lugar comunicados, diretório de pessoas, solicitações de RH, chamados de TI, compras e dashboards de indicadores, com **controle de acesso por cargo garantido no banco de dados**.
+Uma intranet para empresa: comunicados, diretório de pessoas, pedidos de RH, chamados de TI, compras e dashboards de indicadores, tudo num lugar só e com acesso separado por cargo.
 
-🔗 **Demo:** https://central-dados-corporativa.vercel.app
-(crie uma conta na tela de cadastro; novos usuários entram com o perfil "geral")
+Comecei como um painel simples de KPIs e onboarding e fui adicionando módulos aos poucos.
 
-<!-- Adicione aqui um print ou GIF da tela principal, por exemplo:
-![Tela inicial](docs/preview.png)
--->
+Demo: https://central-dados-corporativa.vercel.app
+Dá pra criar uma conta na tela de cadastro. Contas novas entram com o perfil "geral", então alguns módulos ficam ocultos.
 
-## Funcionalidades
+<!-- TODO: adicionar print da tela inicial em docs/preview.png -->
 
-| Área | Módulos |
-| --- | --- |
-| **Geral** | Início (resumo do dia), Mural de comunicados com confirmação de leitura, Diretório de pessoas, Documentos |
-| **Indicadores** | Análise de Dados com KPIs, gráficos, filtros e um assistente de insights que destaca o que melhorou e o que precisa de atenção |
-| **Solicitações** | Solicitações de RH (férias, declarações), Chamados de TI, Compras com fluxo de aprovação |
-| **RH e operações** | Vagas em kanban com SLA de contratação, Automação de onboarding, Desligamento com bloqueio real de acesso, Checklist de visitas técnicas com fotos e assinatura |
-| **Administração** | Gestão de usuários e papéis |
+## O que tem
 
-Também tem: busca rápida com `Ctrl + K`, central de notificações de pendências e atualização em tempo real (Supabase Realtime).
+- Início com o resumo do dia e notificações de pendências
+- Mural de comunicados com confirmação de leitura
+- Diretório de pessoas e área de documentos
+- Dashboard de indicadores com filtros e um assistente que aponta o que melhorou e o que piorou
+- Solicitações de RH (férias, declarações), chamados de TI e pedidos de compra com aprovação
+- Kanban de vagas com SLA de contratação
+- Onboarding e desligamento de colaboradores (o desligado perde o acesso na hora)
+- Checklist de visitas técnicas com fotos e assinatura
+- Tela de administração de usuários e papéis
+- Busca rápida com Ctrl + K
 
-## Segurança e controle de acesso
+## Permissões
 
-- Autenticação com **Supabase Auth**.
-- 9 papéis (`geral`, `rh`, `ti`, `compras`, `marketing`, `admin`…). Cada pessoa só vê os módulos do seu papel.
-- As regras ficam no **PostgreSQL via Row Level Security (RLS)**. O front só esconde botões, e quem garante a permissão é o banco. Assim, a regra vale mesmo chamando a API direto.
-- A migration [`20261001_seguranca_rls.sql`](supabase/migrations/20261001_seguranca_rls.sql) fecha caminhos de escalada de privilégio:
-  - o usuário não consegue alterar o próprio papel;
-  - não dá para se cadastrar como admin pelos metadados do sign up;
-  - quem pede uma compra não aprova a própria solicitação;
-  - colaborador desligado perde o acesso também pela API, não só na tela.
+O login é feito com Supabase Auth e existem 9 papéis (geral, rh, ti, compras, marketing, admin etc.). Cada um enxerga só os módulos que fazem sentido pra ele.
 
-## Tecnologias
+A regra de verdade fica no banco, com Row Level Security no Postgres. No front eu só escondo botões e rotas; se alguém tentar chamar a API direto, o banco bloqueia do mesmo jeito.
 
-- **Front-end:** React 18, TypeScript, Vite, React Router, Tailwind CSS
-- **Formulários e validação:** React Hook Form + Zod
-- **Gráficos:** Recharts
-- **Back-end (BaaS):** Supabase (Auth, PostgreSQL, RLS, Realtime, Storage)
-- **CI/CD:** GitHub Actions (typecheck + build a cada push/PR) e deploy na Vercel
+Na migration [`20261001_seguranca_rls.sql`](supabase/migrations/20261001_seguranca_rls.sql) corrigi algumas brechas que encontrei revisando as policies:
 
-## Estrutura
+- o usuário conseguia trocar o próprio papel com um update direto;
+- dava pra se cadastrar como admin mandando o papel nos metadados do sign up;
+- quem pedia uma compra podia aprovar o próprio pedido;
+- colaborador desligado ainda acessava os dados pela API.
 
-Organizado por funcionalidade (*feature-based*):
+## Stack
 
-```text
-src/
-  app/            rotas, layout, ProtectedRoute e RequireRole
-  features/       um diretório por módulo (pages, components, hooks, data)
-  shared/         componentes, contextos, cliente Supabase, utilitários
-supabase/
-  schema.sql      schema completo (tabelas, policies RLS, storage)
-  migrations/     mudanças incrementais de segurança e novos módulos
-```
+React 18, TypeScript, Vite, React Router, Tailwind, React Hook Form + Zod, Recharts e Supabase (Auth, Postgres, Realtime e Storage).
 
-## Como rodar localmente
+O GitHub Actions roda typecheck e build em cada push e PR, e o deploy é feito na Vercel.
 
-Pré-requisitos: Node.js 20+ e um projeto no [Supabase](https://supabase.com) (o plano gratuito serve).
+## Rodando local
+
+Precisa de Node 20+ e de um projeto no Supabase (o plano free resolve).
 
 ```bash
 git clone https://github.com/PedroSenhorini/central-dados-corporativa.git
@@ -64,29 +51,21 @@ cd central-dados-corporativa
 npm install
 ```
 
-1. No SQL Editor do Supabase, execute `supabase/schema.sql`.
-2. Crie um arquivo `.env` na raiz com as chaves do seu projeto:
+Rode o `supabase/schema.sql` no SQL Editor do Supabase e crie um `.env` na raiz:
 
-   ```env
-   VITE_SUPABASE_URL=https://SEU-PROJETO.supabase.co
-   VITE_SUPABASE_ANON_KEY=sua-anon-key
-   ```
+```env
+VITE_SUPABASE_URL=https://SEU-PROJETO.supabase.co
+VITE_SUPABASE_ANON_KEY=sua-anon-key
+```
 
-3. Rode `npm run dev` e acesse http://localhost:5173
-4. Para virar admin, cadastre-se e execute `supabase/promover-admin.sql` trocando o e-mail pelo seu.
+Depois é só `npm run dev` e abrir http://localhost:5173. Pra virar admin, crie sua conta e rode o `supabase/promover-admin.sql` com o seu e-mail.
 
-| Comando | O que faz |
-| --- | --- |
-| `npm run dev` | ambiente de desenvolvimento |
-| `npm run typecheck` | checagem de tipos |
-| `npm run build` | typecheck + build de produção |
+## Organização
+
+O código está separado por funcionalidade: cada módulo tem sua pasta em `src/features` (páginas, componentes, hooks e dados), e o que é compartilhado fica em `src/shared`. As rotas e os guards de autenticação e papel ficam em `src/app`.
 
 ## Próximos passos
 
-- Testes automatizados (Vitest + Testing Library)
-- Integração do onboarding com a Microsoft Graph API
-- Assistente de insights com LLM
-
-## Autor
-
-**Pedro Senhorini** · [LinkedIn](https://www.linkedin.com/in/pedrosenhorini/) · [GitHub](https://github.com/PedroSenhorini)
+- testes com Vitest e Testing Library
+- integrar o onboarding com a Microsoft Graph API
+- trocar o assistente de insights (hoje baseado em regras) por um modelo de linguagem
